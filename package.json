@@ -1,0 +1,39 @@
+{
+  "name": "stuffy-vibe-v2-discord-bot",
+  "version": "1.0.0",
+  "description": "Bot Discord TypeScript pour configurer le serveur privé 답답한 분위기 V2.",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "lint": "eslint src --ext .ts",
+    "format": "prettier --write .",
+    "deploy-commands": "tsx src/deploy-commands.ts"
+  },
+  "keywords": [
+    "discord",
+    "discord.js",
+    "typescript",
+    "bot"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "discord.js": "^14.19.3",
+    "dotenv": "^16.5.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.28.0",
+    "@types/node": "^22.15.29",
+    "eslint": "^9.28.0",
+    "prettier": "^3.5.3",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.33.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
