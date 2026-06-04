@@ -1,7 +1,7 @@
 import { ChannelType } from 'discord.js';
 import type { Guild, GuildBasedChannel, Role } from 'discord.js';
 import { SERVER_CATEGORIES } from '../config/server.config.js';
-import { findCategory, findChannel } from '../utils/finders.js';
+import { findCategory } from '../utils/finders.js';
 import { logger } from '../utils/logger.js';
 import { PermissionService } from './permission.service.js';
 
@@ -33,7 +33,12 @@ export class ChannelService {
       }
 
       for (const channelConfig of categoryConfig.channels) {
-        const existing = this.findChannelInCategory(guild, channelConfig.name, category.id);
+        const existing = this.findChannelInCategory(
+          guild,
+          channelConfig.name,
+          channelConfig.type,
+          category.id,
+        );
         const channelOverwrites = this.permissionService.channelOverwrites(channelConfig, {
           guild,
           roles,
@@ -71,12 +76,14 @@ export class ChannelService {
   private findChannelInCategory(
     guild: Guild,
     name: string,
+    type: ChannelType.GuildText | ChannelType.GuildVoice,
     parentId: string,
   ): GuildBasedChannel | undefined {
     return (
       guild.channels.cache.find(
-        (channel) => channel.name === name && channel.parentId === parentId,
-      ) ?? findChannel(guild, name)
+        (channel) =>
+          channel.name === name && channel.type === type && channel.parentId === parentId,
+      ) ?? guild.channels.cache.find((channel) => channel.name === name && channel.type === type)
     );
   }
 }

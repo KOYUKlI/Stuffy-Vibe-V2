@@ -66,7 +66,7 @@ export const SERVER_ROLES: RoleConfig[] = [
     color: '#F1C40F',
     hoist: true,
     mentionable: false,
-    permissions: [PermissionFlagsBits.Administrator],
+    permissions: [],
     kind: 'hierarchy',
     protected: true,
   },

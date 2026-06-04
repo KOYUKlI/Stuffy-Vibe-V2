@@ -11,6 +11,9 @@ interface PermissionContext {
 const textReadOnlyDeny = [
   PermissionFlagsBits.SendMessages,
   PermissionFlagsBits.CreatePublicThreads,
+  PermissionFlagsBits.CreatePrivateThreads,
+  PermissionFlagsBits.SendMessagesInThreads,
+  PermissionFlagsBits.AddReactions,
 ];
 const textWriteAllow = [
   PermissionFlagsBits.ViewChannel,
@@ -32,7 +35,23 @@ const moderationAllow = [
   PermissionFlagsBits.ReadMessageHistory,
 ];
 
+const botTextAllow = [
+  PermissionFlagsBits.ViewChannel,
+  PermissionFlagsBits.SendMessages,
+  PermissionFlagsBits.EmbedLinks,
+  PermissionFlagsBits.AttachFiles,
+  PermissionFlagsBits.ReadMessageHistory,
+];
+
 export class PermissionService {
+  private botMemberAllow(
+    context: PermissionContext,
+    allow: bigint[] = botTextAllow,
+    deny: bigint[] = [],
+  ): OverwriteResolvable | undefined {
+    const botMember = context.guild.members.me;
+    return botMember ? { id: botMember.id, allow, deny } : undefined;
+  }
   public categoryOverwrites(
     category: CategoryConfig,
     context: PermissionContext,
@@ -50,7 +69,7 @@ export class PermissionService {
     channel: ChannelConfig,
     context: PermissionContext,
   ): OverwriteResolvable[] {
-    if (channel.staffOnly) return this.staffOnlyOverwrites(context);
+    if (channel.staffOnly) return this.staffOnlyOverwrites(context, channel.botAccess);
 
     if (channel.name === '💬・général') {
       return [
@@ -99,13 +118,10 @@ export class PermissionService {
     ].filter(Boolean) as OverwriteResolvable[];
 
     if (channel.botAccess) {
-      const botRole = this.roleAllow(context, ROLE_NAMES.bot, [
-        PermissionFlagsBits.ViewChannel,
-        PermissionFlagsBits.SendMessages,
-        PermissionFlagsBits.EmbedLinks,
-        PermissionFlagsBits.AttachFiles,
-        PermissionFlagsBits.ReadMessageHistory,
-      ]);
+      const botMember = this.botMemberAllow(context);
+      const botRole = this.roleAllow(context, ROLE_NAMES.bot, botTextAllow);
+
+      if (botMember) overwrites.push(botMember);
       if (botRole) overwrites.push(botRole);
     }
 
@@ -129,8 +145,11 @@ export class PermissionService {
     ].filter(Boolean) as OverwriteResolvable[];
   }
 
-  private staffOnlyOverwrites(context: PermissionContext): OverwriteResolvable[] {
-    return [
+  private staffOnlyOverwrites(
+    context: PermissionContext,
+    botAccess = false,
+  ): OverwriteResolvable[] {
+    const overwrites: OverwriteResolvable[] = [
       { id: context.guild.id, deny: [PermissionFlagsBits.ViewChannel] },
       this.roleDeny(context, ROLE_NAMES.member, [PermissionFlagsBits.ViewChannel]),
       this.roleDeny(context, ROLE_NAMES.elder, [PermissionFlagsBits.ViewChannel]),
@@ -143,6 +162,13 @@ export class PermissionService {
         PermissionFlagsBits.EmbedLinks,
       ]),
     ].filter(Boolean) as OverwriteResolvable[];
+
+    if (botAccess) {
+      const botMember = this.botMemberAllow(context);
+      if (botMember) overwrites.push(botMember);
+    }
+
+    return overwrites;
   }
 
   private staffAllowOverwrites(context: PermissionContext): OverwriteResolvable[] {
