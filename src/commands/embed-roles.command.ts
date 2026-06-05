@@ -23,11 +23,7 @@ export const embedRolesCommand: SlashCommand = {
       });
       return;
     }
-    const embedService = new EmbedService();
-    await channel.send({
-      embeds: [embedService.roles()],
-      components: embedService.roleComponents(),
-    });
-    await interaction.reply({ content: 'Panneau de rôles envoyé.', ephemeral: true });
+    await channel.send({ embeds: [new EmbedService().roles()] });
+    await interaction.reply({ content: 'Embed statique de rôles envoyé.', ephemeral: true });
   },
 };

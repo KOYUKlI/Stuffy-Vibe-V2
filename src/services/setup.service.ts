@@ -20,4 +20,11 @@ export class SetupService {
     await this.channelService.ensureChannels(guild, roles);
     logger.success('Setup terminé avec succès.');
   }
+
+  public async syncPermissions(guild: Guild): Promise<void> {
+    logger.info(`Synchronisation des permissions pour ${guild.name} (${guild.id})`);
+    const roles = this.roleService.configuredRoleMap(guild);
+    await this.channelService.syncPermissions(guild, roles);
+    logger.success('Permissions synchronisées avec succès.');
+  }
 }

@@ -75,6 +75,7 @@ export class PermissionService {
       return [
         { id: context.guild.id, deny: [PermissionFlagsBits.ViewChannel] },
         this.roleDeny(context, ROLE_NAMES.guest, [PermissionFlagsBits.ViewChannel]),
+        this.roleDeny(context, ROLE_NAMES.pending, [PermissionFlagsBits.ViewChannel]),
         this.roleAllow(context, ROLE_NAMES.member, textWriteAllow),
         this.roleAllow(context, ROLE_NAMES.elder, textWriteAllow),
         this.roleAllow(
@@ -99,6 +100,12 @@ export class PermissionService {
       this.roleAllow(
         context,
         ROLE_NAMES.guest,
+        [PermissionFlagsBits.ViewChannel],
+        textReadOnlyDeny,
+      ),
+      this.roleAllow(
+        context,
+        ROLE_NAMES.pending,
         [PermissionFlagsBits.ViewChannel],
         textReadOnlyDeny,
       ),
@@ -133,6 +140,7 @@ export class PermissionService {
     return [
       { id: context.guild.id, deny: [PermissionFlagsBits.ViewChannel] },
       this.roleDeny(context, ROLE_NAMES.guest, [PermissionFlagsBits.ViewChannel]),
+      this.roleDeny(context, ROLE_NAMES.pending, [PermissionFlagsBits.ViewChannel]),
       this.roleAllow(context, ROLE_NAMES.member, allow),
       this.roleAllow(context, ROLE_NAMES.elder, allow),
       this.roleAllow(
@@ -154,6 +162,7 @@ export class PermissionService {
       this.roleDeny(context, ROLE_NAMES.member, [PermissionFlagsBits.ViewChannel]),
       this.roleDeny(context, ROLE_NAMES.elder, [PermissionFlagsBits.ViewChannel]),
       this.roleDeny(context, ROLE_NAMES.guest, [PermissionFlagsBits.ViewChannel]),
+      this.roleDeny(context, ROLE_NAMES.pending, [PermissionFlagsBits.ViewChannel]),
       this.roleAllow(context, ROLE_NAMES.muted, [], [PermissionFlagsBits.ViewChannel]),
       ...this.staffAllowOverwrites(context),
       this.roleAllow(context, ROLE_NAMES.bot, [

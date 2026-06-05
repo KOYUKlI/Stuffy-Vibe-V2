@@ -3,6 +3,17 @@ import { SERVER_ROLES } from '../config/server.config.js';
 import { logger } from '../utils/logger.js';
 
 export class RoleService {
+  public configuredRoleMap(guild: Guild): Map<string, Role> {
+    const roles = new Map<string, Role>();
+
+    for (const roleConfig of SERVER_ROLES) {
+      const role = guild.roles.cache.find((guildRole) => guildRole.name === roleConfig.name);
+      if (role) roles.set(roleConfig.name, role);
+    }
+
+    return roles;
+  }
+
   public async ensureRoles(guild: Guild): Promise<Map<string, Role>> {
     const roles = new Map<string, Role>();
 

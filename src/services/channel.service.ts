@@ -73,6 +73,37 @@ export class ChannelService {
     }
   }
 
+  public async syncPermissions(guild: Guild, roles: Map<string, Role>): Promise<void> {
+    for (const categoryConfig of SERVER_CATEGORIES) {
+      const category = findCategory(guild, categoryConfig.name);
+
+      if (category) {
+        await category.permissionOverwrites.set(
+          this.permissionService.categoryOverwrites(categoryConfig, { guild, roles }),
+          'Synchronisation permissions catégorie',
+        );
+        logger.info(`Permissions catégorie synchronisées: ${categoryConfig.name}`);
+      }
+
+      for (const channelConfig of categoryConfig.channels) {
+        const existing = category
+          ? this.findChannelInCategory(guild, channelConfig.name, channelConfig.type, category.id)
+          : guild.channels.cache.find(
+              (channel) =>
+                channel.name === channelConfig.name && channel.type === channelConfig.type,
+            );
+
+        if (existing && 'permissionOverwrites' in existing) {
+          await existing.permissionOverwrites.set(
+            this.permissionService.channelOverwrites(channelConfig, { guild, roles }),
+            'Synchronisation permissions salon',
+          );
+          logger.info(`Permissions salon synchronisées: ${channelConfig.name}`);
+        }
+      }
+    }
+  }
+
   private findChannelInCategory(
     guild: Guild,
     name: string,

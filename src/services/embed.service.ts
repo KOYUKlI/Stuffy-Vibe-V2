@@ -1,9 +1,4 @@
-import {
-  ActionRowBuilder,
-  EmbedBuilder,
-  StringSelectMenuBuilder,
-  StringSelectMenuOptionBuilder,
-} from 'discord.js';
+import { EmbedBuilder } from 'discord.js';
 import type { GuildMember, User } from 'discord.js';
 import {
   BRANDING,
@@ -12,12 +7,6 @@ import {
   INTEREST_ROLE_NAMES,
   NOTIFICATION_ROLE_NAMES,
 } from '../config/server.config.js';
-
-export const ROLE_SELECT_IDS = {
-  interests: 'roles:interests',
-  notifications: 'roles:notifications',
-  colors: 'roles:colors',
-};
 
 export class EmbedService {
   public welcome(member: GuildMember | User): EmbedBuilder {
@@ -29,12 +18,12 @@ export class EmbedService {
       .setDescription(
         [
           `Bienvenue ${mention} dans ${BRANDING.guildName}.`,
-          'Lis le règlement, choisis tes rôles, puis installe-toi tranquillement.',
+          'Lis le règlement, valide ton accès, puis installe-toi tranquillement.',
           'Ambiance privée · gaming · anime · chill · entre potes.',
           '',
           `• Lis ${CHANNEL_NAMES.rules}`,
-          `• Choisis tes rôles dans ${CHANNEL_NAMES.roles}`,
-          `• Le salon principal est ${CHANNEL_NAMES.general}`,
+          `• Consulte ${CHANNEL_NAMES.guide}`,
+          `• ${CHANNEL_NAMES.roles} sera disponible après validation`,
         ].join('\n'),
       )
       .setFooter({ text: '답답한 분위기 V2 · privé · premium · dark' })
@@ -54,6 +43,9 @@ export class EmbedService {
           '5. Les salons doivent être utilisés correctement.',
           '6. Le staff peut modérer si nécessaire.',
           '7. Le serveur est privé : les invitations doivent rester contrôlées.',
+          '',
+          'Validation : accepte le règlement ici via Sapphire ou Carl-bot.',
+          'Après validation, le rôle ✅・Membre débloque le reste du serveur.',
         ].join('\n'),
       )
       .setFooter({ text: 'Simple, propre, privé.' });
@@ -69,8 +61,8 @@ export class EmbedService {
           '',
           `• Lis ${CHANNEL_NAMES.rules}`,
           `• Consulte ${CHANNEL_NAMES.guide}`,
-          `• Choisis tes rôles dans ${CHANNEL_NAMES.roles}`,
-          `• Rejoins ${CHANNEL_NAMES.general} quand tu es prêt.`,
+          `• La validation est gérée dans ${CHANNEL_NAMES.rules}`,
+          `• ${CHANNEL_NAMES.roles} sera visible après validation.`,
         ].join('\n'),
       );
   }
@@ -83,11 +75,12 @@ export class EmbedService {
         [
           'Le serveur est organisé pour rester lisible et chill.',
           '',
-          '• ACCUEIL : infos importantes et rôles.',
-          '• LOUNGE : discussion, médias, memes et suggestions.',
+          '• ACCUEIL : bienvenue, règlement, guide et infos.',
+          '• LOUNGE : discussion, médias, memes et questions.',
+          '• ACTIVITÉ : events, clips, best-of, sondages et annonces automatisées.',
           '• GAMING : jeux, ranked et sessions entre potes.',
           '• CULTURE : anime, films, musique et créations.',
-          '• BOTS : commandes et outils.',
+          '• BOTS : espaces réservés aux bots externes.',
           '• STAFF : modération et logs privés.',
         ].join('\n'),
       );
@@ -96,47 +89,17 @@ export class EmbedService {
   public roles(): EmbedBuilder {
     return new EmbedBuilder()
       .setColor(BRANDING.primaryColor)
-      .setTitle('🎭 Choisis tes rôles')
+      .setTitle('🎭 Rôles')
       .setDescription(
         [
-          'Sélectionne tes centres d’intérêt, notifications et une couleur.',
+          'Ce panneau est statique.',
           '',
-          '• Les rôles centres d’intérêt et notifications sont cumulables.',
-          '• Un seul rôle couleur peut être actif à la fois.',
+          'Les rôles sont attribués par Sapphire, Carl-bot ou un autre bot externe configuré dans Discord.',
+          '',
+          `Centres d’intérêt : ${INTEREST_ROLE_NAMES.join(', ')}`,
+          `Notifications : ${NOTIFICATION_ROLE_NAMES.join(', ')}`,
+          `Couleurs : ${COLOR_ROLE_NAMES.join(', ')}`,
         ].join('\n'),
       );
-  }
-
-  public roleComponents() {
-    const interestSelect = new StringSelectMenuBuilder()
-      .setCustomId(ROLE_SELECT_IDS.interests)
-      .setPlaceholder('Centres d’intérêt')
-      .setMinValues(0)
-      .setMaxValues(INTEREST_ROLE_NAMES.length)
-      .addOptions(INTEREST_ROLE_NAMES.map((name) => this.option(name)));
-
-    const notificationSelect = new StringSelectMenuBuilder()
-      .setCustomId(ROLE_SELECT_IDS.notifications)
-      .setPlaceholder('Notifications')
-      .setMinValues(0)
-      .setMaxValues(NOTIFICATION_ROLE_NAMES.length)
-      .addOptions(NOTIFICATION_ROLE_NAMES.map((name) => this.option(name)));
-
-    const colorSelect = new StringSelectMenuBuilder()
-      .setCustomId(ROLE_SELECT_IDS.colors)
-      .setPlaceholder('Couleur unique')
-      .setMinValues(0)
-      .setMaxValues(1)
-      .addOptions(COLOR_ROLE_NAMES.map((name) => this.option(name)));
-
-    return [
-      new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(interestSelect),
-      new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(notificationSelect),
-      new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(colorSelect),
-    ];
-  }
-
-  private option(roleName: string): StringSelectMenuOptionBuilder {
-    return new StringSelectMenuOptionBuilder().setLabel(roleName).setValue(roleName);
   }
 }

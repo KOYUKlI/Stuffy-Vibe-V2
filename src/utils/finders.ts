@@ -9,12 +9,20 @@ export function findChannel(guild: Guild, name: string): GuildBasedChannel | und
   return guild.channels.cache.find((channel) => channel.name === name);
 }
 
+export function findChannelByNameAndType(
+  guild: Guild,
+  name: string,
+  type: ChannelType.GuildText | ChannelType.GuildVoice | ChannelType.GuildCategory,
+): GuildBasedChannel | undefined {
+  return guild.channels.cache.find((channel) => channel.name === name && channel.type === type);
+}
+
 export function findTextChannel(guild: Guild, name: string) {
-  const channel = findChannel(guild, name);
+  const channel = findChannelByNameAndType(guild, name, ChannelType.GuildText);
   return channel?.type === ChannelType.GuildText ? channel : undefined;
 }
 
 export function findCategory(guild: Guild, name: string) {
-  const channel = findChannel(guild, name);
+  const channel = findChannelByNameAndType(guild, name, ChannelType.GuildCategory);
   return channel?.type === ChannelType.GuildCategory ? channel : undefined;
 }
