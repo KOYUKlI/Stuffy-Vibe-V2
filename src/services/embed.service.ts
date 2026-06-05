@@ -1,105 +1,82 @@
 import { EmbedBuilder } from 'discord.js';
-import type { GuildMember, User } from 'discord.js';
-import {
-  BRANDING,
-  CHANNEL_NAMES,
-  COLOR_ROLE_NAMES,
-  INTEREST_ROLE_NAMES,
-  NOTIFICATION_ROLE_NAMES,
-} from '../config/server.config.js';
+import { BRANDING } from '../config/branding.config.js';
+import { CHANNEL_NAMES } from '../config/channels.config.js';
 
 export class EmbedService {
-  public welcome(member: GuildMember | User): EmbedBuilder {
-    const mention = 'user' in member ? `<@${member.user.id}>` : `<@${member.id}>`;
-
-    return new EmbedBuilder()
-      .setColor(BRANDING.accentColor)
+  public welcome(): EmbedBuilder {
+    return this.base()
       .setTitle(`Bienvenue dans ${BRANDING.guildName}`)
       .setDescription(
         [
-          `Bienvenue ${mention} dans ${BRANDING.guildName}.`,
-          'Lis le règlement, valide ton accès, puis installe-toi tranquillement.',
-          'Ambiance privée · gaming · anime · chill · entre potes.',
+          'Serveur privé entre amis, ambiance gaming, anime et chill.',
           '',
-          `• Lis ${CHANNEL_NAMES.rules}`,
-          `• Consulte ${CHANNEL_NAMES.guide}`,
-          `• ${CHANNEL_NAMES.roles} sera disponible après validation`,
+          `• Lis ${CHANNEL_NAMES.rules}.`,
+          '• La validation se fait directement dans le règlement.',
+          '• Une fois validé, tu débloques le serveur principal avec le rôle ✅・Membre.',
         ].join('\n'),
-      )
-      .setFooter({ text: '답답한 분위기 V2 · privé · premium · dark' })
-      .setTimestamp();
+      );
   }
 
   public rules(): EmbedBuilder {
-    return new EmbedBuilder()
-      .setColor(BRANDING.primaryColor)
-      .setTitle('📜 Règlement')
+    return this.base()
+      .setTitle('📜 Règlement & Validation')
       .setDescription(
         [
           '1. Respect obligatoire.',
-          '2. Pas de spam, flood ou drama inutile.',
-          '3. Pas d’insultes graves, harcèlement ou provocations ciblées.',
-          '4. Pas de contenu illégal, dangereux ou NSFW.',
-          '5. Les salons doivent être utilisés correctement.',
-          '6. Le staff peut modérer si nécessaire.',
-          '7. Le serveur est privé : les invitations doivent rester contrôlées.',
+          '2. Pas de spam ou flood.',
+          '3. Pas de drama inutile.',
+          '4. Pas de harcèlement.',
+          '5. Pas de contenu illégal, dangereux ou NSFW.',
+          '6. Utilise les salons correctement.',
+          '7. Le serveur est privé : invitations contrôlées.',
           '',
-          'Validation : accepte le règlement ici via Sapphire ou Carl-bot.',
-          'Après validation, le rôle ✅・Membre débloque le reste du serveur.',
-        ].join('\n'),
-      )
-      .setFooter({ text: 'Simple, propre, privé.' });
-  }
-
-  public fixedWelcome(): EmbedBuilder {
-    return new EmbedBuilder()
-      .setColor(BRANDING.accentColor)
-      .setTitle(`✦ ${BRANDING.guildName}`)
-      .setDescription(
-        [
-          'Bienvenue dans notre serveur privé.',
-          '',
-          `• Lis ${CHANNEL_NAMES.rules}`,
-          `• Consulte ${CHANNEL_NAMES.guide}`,
-          `• La validation est gérée dans ${CHANNEL_NAMES.rules}`,
-          `• ${CHANNEL_NAMES.roles} sera visible après validation.`,
+          '**Validation**',
+          'Après lecture, utilise le bouton ou la réaction de validation configuré par le staff. Cela te donnera le rôle ✅・Membre.',
         ].join('\n'),
       );
   }
 
   public guide(): EmbedBuilder {
-    return new EmbedBuilder()
-      .setColor(BRANDING.secondaryColor)
+    return this.base()
       .setTitle('🧭 Guide du serveur')
       .setDescription(
         [
-          'Le serveur est organisé pour rester lisible et chill.',
-          '',
-          '• ACCUEIL : bienvenue, règlement, guide et infos.',
-          '• LOUNGE : discussion, médias, memes et questions.',
-          '• ACTIVITÉ : events, clips, best-of, sondages et annonces automatisées.',
-          '• GAMING : jeux, ranked et sessions entre potes.',
-          '• CULTURE : anime, films, musique et créations.',
-          '• BOTS : espaces réservés aux bots externes.',
-          '• STAFF : modération et logs privés.',
+          `• Parler au quotidien : ${CHANNEL_NAMES.general}.`,
+          '• Poster médias, memes et clips : LOUNGE et ACTIVITÉ.',
+          '• Chercher des joueurs : 🔎・lfg.',
+          '• Voir les events : 📅・events.',
+          `• Choisir ses rôles : ${CHANNEL_NAMES.roles}.`,
+          '• Contacter le staff : tickets ou signalements via les bots externes.',
         ].join('\n'),
       );
   }
 
-  public roles(): EmbedBuilder {
-    return new EmbedBuilder()
-      .setColor(BRANDING.primaryColor)
-      .setTitle('🎭 Rôles')
+  public botPlan(): EmbedBuilder {
+    return this.base()
+      .setTitle('⚙️ Plan des bots externes')
       .setDescription(
         [
-          'Ce panneau est statique.',
+          'Ce bot custom provisionne seulement la structure. Les usages quotidiens restent aux bots dédiés.',
           '',
-          'Les rôles sont attribués par Sapphire, Carl-bot ou un autre bot externe configuré dans Discord.',
-          '',
-          `Centres d’intérêt : ${INTEREST_ROLE_NAMES.join(', ')}`,
-          `Notifications : ${NOTIFICATION_ROLE_NAMES.join(', ')}`,
-          `Couleurs : ${COLOR_ROLE_NAMES.join(', ')}`,
+          '• Sapphire ou Carl-bot : validation règlement, rôles, embeds, logs simples.',
+          '• Ticket Tool : tickets et signalements.',
+          '• VoiceMaster ou TempVoice : vocaux temporaires.',
+          '• Sesh ou Apollo : events, game nights, watch parties.',
+          '• Statbot : statistiques d’activité.',
+          '• PatchBot : patch notes jeux.',
+          '• FreeStuff : jeux gratuits.',
+          '• Starboard : best-of des messages.',
+          '• EasyPoll ou Pollmaster : sondages avancés.',
+          '• Jockie Music ou Kenku FM : musique.',
+          '• Beemo ou Double Counter : sécurité anti-raid si invitations plus ouvertes.',
         ].join('\n'),
       );
+  }
+
+  private base(): EmbedBuilder {
+    return new EmbedBuilder()
+      .setColor(BRANDING.colors.midnightBlue)
+      .setFooter({ text: BRANDING.footer })
+      .setTimestamp();
   }
 }

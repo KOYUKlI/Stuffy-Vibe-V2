@@ -1,101 +1,169 @@
-import { PermissionFlagsBits } from 'discord.js';
-import type { Guild } from 'discord.js';
-import {
-  CHANNEL_NAMES,
-  ROLE_NAMES,
-  SERVER_CATEGORIES,
-  SERVER_ROLES,
-} from '../config/server.config.js';
+import { ChannelType, PermissionFlagsBits } from 'discord.js';
+import type { Guild, GuildBasedChannel } from 'discord.js';
+import { CHANNEL_NAMES, SERVER_CATEGORIES } from '../config/channels.config.js';
+import { ROLE_NAMES, SERVER_ROLES } from '../config/roles.config.js';
+import type { ChannelConfig } from '../types/server-config.types.js';
 import {
   findCategory,
   findChannelByNameAndType,
+  findChannelInCategory,
   findRole,
-  findTextChannel,
 } from '../utils/finders.js';
+import { channelLabel, channelTypeLabel } from '../utils/format.js';
 
 export interface AuditReport {
   missingRoles: string[];
   missingCategories: string[];
   missingChannels: string[];
-  criticalPermissions: string[];
+  permissionIssues: string[];
+  duplicateIssues: string[];
 }
 
 export class AuditService {
   public run(guild: Guild): AuditReport {
-    const missingRoles = SERVER_ROLES.filter((role) => !findRole(guild, role.name)).map(
-      (role) => role.name,
-    );
-    const missingCategories = SERVER_CATEGORIES.filter(
-      (category) => !findCategory(guild, category.name),
-    ).map((category) => category.name);
-    const missingChannels = SERVER_CATEGORIES.flatMap((category) =>
-      category.channels
-        .filter((channel) => !findChannelByNameAndType(guild, channel.name, channel.type))
-        .map((channel) => channel.name),
-    );
-
     return {
-      missingRoles,
-      missingCategories,
-      missingChannels,
-      criticalPermissions: this.checkCriticalPermissions(guild),
+      missingRoles: this.missingRoles(guild),
+      missingCategories: this.missingCategories(guild),
+      missingChannels: this.missingChannels(guild),
+      permissionIssues: this.permissionIssues(guild),
+      duplicateIssues: this.duplicateIssues(guild),
     };
   }
 
-  private checkCriticalPermissions(guild: Guild): string[] {
+  private missingRoles(guild: Guild): string[] {
+    return SERVER_ROLES.filter((role) => !findRole(guild, role.name)).map((role) => role.name);
+  }
+
+  private missingCategories(guild: Guild): string[] {
+    return SERVER_CATEGORIES.filter((category) => !findCategory(guild, category.name)).map(
+      (category) => category.name,
+    );
+  }
+
+  private missingChannels(guild: Guild): string[] {
+    return SERVER_CATEGORIES.flatMap((category) => {
+      const guildCategory = findCategory(guild, category.name);
+      return category.channels
+        .filter((channel) => !this.findExpectedChannel(guild, guildCategory?.id, channel))
+        .map((channel) => `${category.name} / ${channel.name} (${channelTypeLabel(channel.type)})`);
+    });
+  }
+
+  private permissionIssues(guild: Guild): string[] {
     const issues: string[] = [];
     const everyone = guild.roles.everyone;
-    const general = findTextChannel(guild, CHANNEL_NAMES.general);
-    const staffAdmin = findTextChannel(guild, CHANNEL_NAMES.admin);
-    const welcome = findTextChannel(guild, CHANNEL_NAMES.welcome);
-    const rules = findTextChannel(guild, CHANNEL_NAMES.rules);
-    const guide = findTextChannel(guild, CHANNEL_NAMES.guide);
-    const roles = findTextChannel(guild, CHANNEL_NAMES.roles);
-    const member = findRole(guild, ROLE_NAMES.member);
-    const guest = findRole(guild, ROLE_NAMES.guest);
     const pending = findRole(guild, ROLE_NAMES.pending);
+    const member = findRole(guild, ROLE_NAMES.member);
+    const staffOnlyNames: string[] = [CHANNEL_NAMES.logs, CHANNEL_NAMES.tickets, '🛠️・admin'];
+    const entryNames: string[] = [CHANNEL_NAMES.welcome, CHANNEL_NAMES.rules, CHANNEL_NAMES.guide];
 
-    if (general && guest && general.permissionsFor(guest)?.has(PermissionFlagsBits.ViewChannel)) {
-      issues.push(`${ROLE_NAMES.guest} ne doit pas voir ${CHANNEL_NAMES.general}.`);
-    }
+    for (const channel of guild.channels.cache.values()) {
+      if (!('permissionsFor' in channel)) continue;
 
-    if (
-      general &&
-      pending &&
-      general.permissionsFor(pending)?.has(PermissionFlagsBits.ViewChannel)
-    ) {
-      issues.push(`${ROLE_NAMES.pending} ne doit pas voir ${CHANNEL_NAMES.general}.`);
-    }
-
-    if (
-      staffAdmin &&
-      member &&
-      staffAdmin.permissionsFor(member)?.has(PermissionFlagsBits.ViewChannel)
-    ) {
-      issues.push(`${ROLE_NAMES.member} ne doit pas voir ${CHANNEL_NAMES.admin}.`);
-    }
-
-    if (welcome && welcome.permissionsFor(everyone)?.has(PermissionFlagsBits.SendMessages)) {
-      issues.push(`@everyone ne doit pas écrire dans ${CHANNEL_NAMES.welcome}.`);
-    }
-
-    for (const channel of [welcome, rules, guide]) {
-      if (channel && !channel.permissionsFor(everyone)?.has(PermissionFlagsBits.ViewChannel)) {
-        issues.push(`@everyone doit voir ${channel.name}.`);
+      const isEntry = entryNames.includes(channel.name);
+      if (!isEntry && channel.permissionsFor(everyone)?.has(PermissionFlagsBits.ViewChannel)) {
+        issues.push(
+          `@everyone voit ${channelLabel(channel)} alors que seule l'entrée doit être visible.`,
+        );
       }
+
+      if (
+        pending &&
+        !isEntry &&
+        channel.permissionsFor(pending)?.has(PermissionFlagsBits.ViewChannel)
+      ) {
+        issues.push(`${ROLE_NAMES.pending} voit ${channelLabel(channel)} hors zone d'entrée.`);
+      }
+
+      if (isEntry && channel.permissionsFor(everyone)?.has(PermissionFlagsBits.SendMessages)) {
+        issues.push(`@everyone peut écrire dans ${channelLabel(channel)}.`);
+      }
+    }
+
+    for (const name of entryNames) {
+      const channel = this.findTextOrForum(guild, name);
+      if (!channel) continue;
+      if (!channel.permissionsFor(everyone)?.has(PermissionFlagsBits.ViewChannel)) {
+        issues.push(`@everyone ne voit pas ${name}.`);
+      }
+      if (pending && !channel.permissionsFor(pending)?.has(PermissionFlagsBits.ViewChannel)) {
+        issues.push(`${ROLE_NAMES.pending} ne voit pas ${name}.`);
+      }
+    }
+
+    const rolesChannel = this.findTextOrForum(guild, CHANNEL_NAMES.roles);
+    if (
+      rolesChannel &&
+      pending &&
+      rolesChannel.permissionsFor(pending)?.has(PermissionFlagsBits.ViewChannel)
+    ) {
+      issues.push(`${ROLE_NAMES.pending} ne doit pas voir ${CHANNEL_NAMES.roles}.`);
+    }
+    if (
+      rolesChannel &&
+      member &&
+      !rolesChannel.permissionsFor(member)?.has(PermissionFlagsBits.ViewChannel)
+    ) {
+      issues.push(`${ROLE_NAMES.member} doit voir ${CHANNEL_NAMES.roles}.`);
+    }
+
+    for (const name of staffOnlyNames) {
+      const channel = this.findTextOrForum(guild, name);
       if (
         channel &&
-        pending &&
-        !channel.permissionsFor(pending)?.has(PermissionFlagsBits.ViewChannel)
+        member &&
+        channel.permissionsFor(member)?.has(PermissionFlagsBits.ViewChannel)
       ) {
-        issues.push(`${ROLE_NAMES.pending} doit voir ${channel.name}.`);
+        issues.push(`${ROLE_NAMES.member} voit le salon staff ${name}.`);
       }
-    }
-
-    if (roles && pending && roles.permissionsFor(pending)?.has(PermissionFlagsBits.ViewChannel)) {
-      issues.push(`${ROLE_NAMES.pending} ne doit pas voir ${CHANNEL_NAMES.roles}.`);
     }
 
     return issues;
+  }
+
+  private duplicateIssues(guild: Guild): string[] {
+    const grouped = new Map<string, GuildBasedChannel[]>();
+    for (const channel of guild.channels.cache.values()) {
+      const key = `${channel.name}:${channel.type}`;
+      const channels = grouped.get(key) ?? [];
+      channels.push(channel);
+      grouped.set(key, channels);
+    }
+
+    return [...grouped.values()]
+      .filter((channels) => channels.length > 1)
+      .map((channels) => {
+        const first = channels[0];
+        return `${first.name} (${channelTypeLabel(first.type)}) apparaît ${channels.length} fois.`;
+      });
+  }
+
+  private findExpectedChannel(
+    guild: Guild,
+    parentId: string | undefined,
+    channel: ChannelConfig,
+  ): GuildBasedChannel | undefined {
+    if (parentId) {
+      return (
+        findChannelInCategory(guild, channel.name, channel.type, parentId) ??
+        (channel.fallbackType
+          ? findChannelInCategory(guild, channel.name, channel.fallbackType, parentId)
+          : undefined)
+      );
+    }
+
+    return (
+      findChannelByNameAndType(guild, channel.name, channel.type) ??
+      (channel.fallbackType
+        ? findChannelByNameAndType(guild, channel.name, channel.fallbackType)
+        : undefined)
+    );
+  }
+
+  private findTextOrForum(guild: Guild, name: string): GuildBasedChannel | undefined {
+    return (
+      findChannelByNameAndType(guild, name, ChannelType.GuildText) ??
+      findChannelByNameAndType(guild, name, ChannelType.GuildForum)
+    );
   }
 }

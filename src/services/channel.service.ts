@@ -1,120 +1,201 @@
 import { ChannelType } from 'discord.js';
-import type { Guild, GuildBasedChannel, Role } from 'discord.js';
-import { SERVER_CATEGORIES } from '../config/server.config.js';
-import { findCategory } from '../utils/finders.js';
+import type { CategoryChannel, Guild, GuildBasedChannel, Role } from 'discord.js';
+import { SERVER_CATEGORIES } from '../config/channels.config.js';
+import type { ChannelConfig, ManualChannelOptions } from '../types/server-config.types.js';
+import { findCategory, findChannelInCategory } from '../utils/finders.js';
 import { logger } from '../utils/logger.js';
 import { PermissionService } from './permission.service.js';
 
 export class ChannelService {
   private readonly permissionService = new PermissionService();
 
-  public async ensureChannels(guild: Guild, roles: Map<string, Role>): Promise<void> {
+  public async ensureCategoriesAndChannels(
+    guild: Guild,
+    roles: Map<string, Role>,
+    dryRun = false,
+  ): Promise<void> {
     for (const categoryConfig of SERVER_CATEGORIES) {
       let category = findCategory(guild, categoryConfig.name);
-      const permissionOverwrites = this.permissionService.categoryOverwrites(categoryConfig, {
+      const categoryOverwrites = this.permissionService.categoryOverwrites(categoryConfig, {
         guild,
         roles,
       });
 
       if (!category) {
+        if (dryRun) {
+          logger.info(`[dry-run] Créerait la catégorie: ${categoryConfig.name}`);
+          continue;
+        }
+
         category = await guild.channels.create({
           name: categoryConfig.name,
           type: ChannelType.GuildCategory,
-          permissionOverwrites,
-          reason: 'Création de la structure 답답한 분위기 V2',
+          permissionOverwrites: categoryOverwrites,
+          reason: 'Création catégorie provisioning 답답한 분위기 V2',
         });
         logger.success(`Catégorie créée: ${categoryConfig.name}`);
-      } else {
+      } else if (!dryRun) {
         await category.permissionOverwrites.set(
-          permissionOverwrites,
+          categoryOverwrites,
           'Synchronisation permissions catégorie',
         );
         logger.info(`Catégorie synchronisée: ${categoryConfig.name}`);
       }
 
+      if (!category) continue;
+
       for (const channelConfig of categoryConfig.channels) {
-        const existing = this.findChannelInCategory(
-          guild,
-          channelConfig.name,
-          channelConfig.type,
-          category.id,
-        );
-        const channelOverwrites = this.permissionService.channelOverwrites(channelConfig, {
-          guild,
-          roles,
-        });
-
-        if (existing) {
-          if ('setParent' in existing) {
-            await existing.setParent(category.id, {
-              lockPermissions: false,
-              reason: 'Synchronisation catégorie',
-            });
-          }
-          if ('permissionOverwrites' in existing) {
-            await existing.permissionOverwrites.set(
-              channelOverwrites,
-              'Synchronisation permissions salon',
-            );
-          }
-          logger.info(`Salon synchronisé: ${channelConfig.name}`);
-          continue;
-        }
-
-        await guild.channels.create({
-          name: channelConfig.name,
-          type: channelConfig.type,
-          parent: category.id,
-          permissionOverwrites: channelOverwrites,
-          reason: 'Création de la structure 답답한 분위기 V2',
-        });
-        logger.success(`Salon créé: ${channelConfig.name}`);
+        await this.ensureChannel(guild, category, channelConfig, roles, dryRun);
       }
     }
   }
 
-  public async syncPermissions(guild: Guild, roles: Map<string, Role>): Promise<void> {
+  public async syncPermissions(
+    guild: Guild,
+    roles: Map<string, Role>,
+    dryRun = false,
+  ): Promise<void> {
     for (const categoryConfig of SERVER_CATEGORIES) {
       const category = findCategory(guild, categoryConfig.name);
+      if (!category) {
+        logger.warn(`Catégorie absente, permissions ignorées: ${categoryConfig.name}`);
+        continue;
+      }
 
-      if (category) {
+      if (dryRun) {
+        logger.info(`[dry-run] Réappliquerait les permissions catégorie: ${categoryConfig.name}`);
+      } else {
         await category.permissionOverwrites.set(
           this.permissionService.categoryOverwrites(categoryConfig, { guild, roles }),
           'Synchronisation permissions catégorie',
         );
-        logger.info(`Permissions catégorie synchronisées: ${categoryConfig.name}`);
       }
 
       for (const channelConfig of categoryConfig.channels) {
-        const existing = category
-          ? this.findChannelInCategory(guild, channelConfig.name, channelConfig.type, category.id)
-          : guild.channels.cache.find(
-              (channel) =>
-                channel.name === channelConfig.name && channel.type === channelConfig.type,
-            );
-
-        if (existing && 'permissionOverwrites' in existing) {
-          await existing.permissionOverwrites.set(
-            this.permissionService.channelOverwrites(channelConfig, { guild, roles }),
-            'Synchronisation permissions salon',
-          );
-          logger.info(`Permissions salon synchronisées: ${channelConfig.name}`);
+        const channel = this.findExpectedChannel(guild, category.id, channelConfig);
+        if (!channel || !('permissionOverwrites' in channel)) {
+          logger.warn(`Salon absent, permissions ignorées: ${channelConfig.name}`);
+          continue;
         }
+
+        if (dryRun) {
+          logger.info(`[dry-run] Réappliquerait les permissions salon: ${channelConfig.name}`);
+          continue;
+        }
+
+        await channel.permissionOverwrites.set(
+          this.permissionService.channelOverwrites(channelConfig, { guild, roles }),
+          'Synchronisation permissions salon',
+        );
+        logger.info(`Permissions salon synchronisées: ${channelConfig.name}`);
       }
     }
   }
 
-  private findChannelInCategory(
+  public async createManualChannel(
     guild: Guild,
-    name: string,
-    type: ChannelType.GuildText | ChannelType.GuildVoice,
+    roles: Map<string, Role>,
+    options: ManualChannelOptions,
+  ): Promise<GuildBasedChannel> {
+    const category = options.categoryName ? findCategory(guild, options.categoryName) : undefined;
+    const overwrites = this.permissionService.manualChannelOverwrites(options, { guild, roles });
+    const created = await this.createChannelWithFallback(guild, options, category, overwrites);
+    logger.success(`Salon manuel créé: ${created.name}`);
+    return created;
+  }
+
+  private async ensureChannel(
+    guild: Guild,
+    category: CategoryChannel,
+    channelConfig: ChannelConfig,
+    roles: Map<string, Role>,
+    dryRun: boolean,
+  ): Promise<void> {
+    const existing = this.findExpectedChannel(guild, category.id, channelConfig);
+    const overwrites = this.permissionService.channelOverwrites(channelConfig, { guild, roles });
+
+    if (existing) {
+      if (dryRun) {
+        logger.info(`[dry-run] Synchroniserait le salon: ${channelConfig.name}`);
+        return;
+      }
+
+      if ('setParent' in existing && existing.parentId !== category.id) {
+        await existing.setParent(category.id, {
+          lockPermissions: false,
+          reason: 'Synchronisation catégorie salon',
+        });
+      }
+      if ('permissionOverwrites' in existing) {
+        await existing.permissionOverwrites.set(overwrites, 'Synchronisation permissions salon');
+      }
+      logger.info(`Salon synchronisé: ${channelConfig.name}`);
+      return;
+    }
+
+    if (dryRun) {
+      logger.info(`[dry-run] Créerait le salon: ${channelConfig.name}`);
+      return;
+    }
+
+    const created = await this.createChannelWithFallback(
+      guild,
+      channelConfig,
+      category,
+      overwrites,
+    );
+    logger.success(`Salon créé: ${created.name}`);
+  }
+
+  private findExpectedChannel(
+    guild: Guild,
     parentId: string,
+    channelConfig: ChannelConfig,
   ): GuildBasedChannel | undefined {
     return (
-      guild.channels.cache.find(
-        (channel) =>
-          channel.name === name && channel.type === type && channel.parentId === parentId,
-      ) ?? guild.channels.cache.find((channel) => channel.name === name && channel.type === type)
+      findChannelInCategory(guild, channelConfig.name, channelConfig.type, parentId) ??
+      (channelConfig.fallbackType
+        ? findChannelInCategory(guild, channelConfig.name, channelConfig.fallbackType, parentId)
+        : undefined)
     );
+  }
+
+  private async createChannelWithFallback(
+    guild: Guild,
+    channel: ChannelConfig | ManualChannelOptions,
+    category: CategoryChannel | undefined,
+    permissionOverwrites: ReturnType<PermissionService['channelOverwrites']>,
+  ): Promise<GuildBasedChannel> {
+    const fallbackType =
+      'fallbackType' in channel && channel.fallbackType
+        ? channel.fallbackType
+        : channel.type === ChannelType.GuildForum
+          ? ChannelType.GuildText
+          : undefined;
+
+    try {
+      return await guild.channels.create({
+        name: channel.name,
+        type: channel.type,
+        parent: category?.id,
+        permissionOverwrites,
+        reason: 'Création salon provisioning 답답한 분위기 V2',
+      });
+    } catch (error) {
+      if (channel.type !== ChannelType.GuildForum || !fallbackType) {
+        throw error;
+      }
+
+      logger.warn(
+        `Création forum impossible pour ${channel.name}; fallback en salon texte. Active Community si tu veux des forums.`,
+      );
+      return guild.channels.create({
+        name: channel.name,
+        type: fallbackType,
+        parent: category?.id,
+        permissionOverwrites,
+        reason: 'Fallback salon texte après échec forum',
+      });
+    }
   }
 }

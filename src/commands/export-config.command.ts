@@ -1,44 +1,28 @@
-import { AttachmentBuilder, SlashCommandBuilder } from 'discord.js';
+import { SlashCommandBuilder } from 'discord.js';
 import type { SlashCommand } from './command.js';
-import {
-  BRANDING,
-  CHANNEL_NAMES,
-  ROLE_NAMES,
-  SERVER_CATEGORIES,
-  SERVER_ROLES,
-} from '../config/server.config.js';
-import { hasSetupAccess } from '../utils/permissions.js';
+import { ExportService } from '../services/export.service.js';
+import { hasProvisioningAccess } from '../utils/permissions.js';
 
 export const exportConfigCommand: SlashCommand = {
   data: new SlashCommandBuilder()
     .setName('export-config')
-    .setDescription('Exporte la configuration attendue du serveur en JSON.'),
+    .setDescription('Exporte la structure actuelle du serveur dans exports/.'),
   async execute(interaction) {
-    if (!hasSetupAccess(interaction)) {
+    if (!hasProvisioningAccess(interaction)) {
       await interaction.reply({ content: 'Accès refusé.', ephemeral: true });
       return;
     }
+    if (!interaction.guild) throw new Error('Commande utilisable uniquement dans un serveur.');
 
-    const payload = {
-      branding: BRANDING,
-      roleNames: ROLE_NAMES,
-      channelNames: CHANNEL_NAMES,
-      roles: SERVER_ROLES,
-      categories: SERVER_CATEGORIES,
-    };
-    const json = JSON.stringify(payload, bigintSafeReplacer, 2);
-    const attachment = new AttachmentBuilder(Buffer.from(json, 'utf8'), {
-      name: 'stuffy-vibe-v2.server-config.json',
-    });
-
-    await interaction.reply({
-      content: 'Configuration exportée.',
-      files: [attachment],
-      ephemeral: true,
-    });
+    await interaction.deferReply({ ephemeral: true });
+    const result = await new ExportService().exportGuild(interaction.guild);
+    await interaction.editReply(
+      [
+        'Export terminé.',
+        `Fichier : ${result.filePath}`,
+        `Rôles exportés : ${result.roleCount}`,
+        `Salons exportés : ${result.channelCount}`,
+      ].join('\n'),
+    );
   },
 };
-
-function bigintSafeReplacer(_key: string, value: unknown): unknown {
-  return typeof value === 'bigint' ? value.toString() : value;
-}

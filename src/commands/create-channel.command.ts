@@ -1,27 +1,23 @@
 import { ChannelType, SlashCommandBuilder } from 'discord.js';
-import type { CategoryChannel, Guild, GuildBasedChannel, Role } from 'discord.js';
 import type { SlashCommand } from './command.js';
-import type { CategoryConfig, ChannelConfig } from '../config/server.config.js';
-import { PermissionService } from '../services/permission.service.js';
+import type { ProvisionedChannelType } from '../types/server-config.types.js';
+import { findCategory, findChannelByNameAndType, findChannelInCategory } from '../utils/finders.js';
+import { hasProvisioningAccess } from '../utils/permissions.js';
+import { ChannelService } from '../services/channel.service.js';
 import { RoleService } from '../services/role.service.js';
-import { findCategory, findChannelByNameAndType } from '../utils/finders.js';
-import { hasSetupAccess } from '../utils/permissions.js';
-
-type ChannelKind = 'text' | 'voice' | 'category';
-type PermissionProfile = 'public-readonly' | 'member' | 'staff' | 'bot';
 
 const channelTypes = {
   text: ChannelType.GuildText,
   voice: ChannelType.GuildVoice,
-  category: ChannelType.GuildCategory,
+  forum: ChannelType.GuildForum,
 } as const;
 
 export const createChannelCommand: SlashCommand = {
   data: new SlashCommandBuilder()
     .setName('create-channel')
-    .setDescription('Crée un salon ou une catégorie de provisioning.')
+    .setDescription('Crée manuellement un salon texte, vocal ou forum.')
     .addStringOption((option) =>
-      option.setName('name').setDescription('Nom exact à créer.').setRequired(true),
+      option.setName('name').setDescription('Nom exact du salon.').setRequired(true),
     )
     .addStringOption((option) =>
       option
@@ -31,126 +27,63 @@ export const createChannelCommand: SlashCommand = {
         .addChoices(
           { name: 'Texte', value: 'text' },
           { name: 'Vocal', value: 'voice' },
-          { name: 'Catégorie', value: 'category' },
+          { name: 'Forum', value: 'forum' },
         ),
     )
     .addStringOption((option) =>
-      option
-        .setName('profile')
-        .setDescription('Profil de permissions à appliquer.')
-        .setRequired(true)
-        .addChoices(
-          { name: 'Public lecture seule', value: 'public-readonly' },
-          { name: 'Membres', value: 'member' },
-          { name: 'Staff', value: 'staff' },
-          { name: 'Bot externe', value: 'bot' },
-        ),
+      option.setName('category').setDescription('Nom exact de la catégorie parente.'),
     )
-    .addStringOption((option) =>
-      option
-        .setName('category')
-        .setDescription('Catégorie parente existante, ignorée pour une catégorie.'),
+    .addBooleanOption((option) =>
+      option.setName('member-only').setDescription('Visible seulement après rôle ✅・Membre.'),
+    )
+    .addBooleanOption((option) =>
+      option.setName('staff-only').setDescription('Visible seulement staff.'),
+    )
+    .addBooleanOption((option) =>
+      option.setName('readonly').setDescription('Lecture seule pour les membres autorisés.'),
     ),
   async execute(interaction) {
-    if (!hasSetupAccess(interaction)) {
+    if (!hasProvisioningAccess(interaction)) {
       await interaction.reply({ content: 'Accès refusé.', ephemeral: true });
       return;
     }
     if (!interaction.guild) throw new Error('Commande utilisable uniquement dans un serveur.');
 
     const name = interaction.options.getString('name', true);
-    const kind = interaction.options.getString('type', true) as ChannelKind;
-    const profile = interaction.options.getString('profile', true) as PermissionProfile;
-    const parentName = interaction.options.getString('category');
+    const categoryName = interaction.options.getString('category') ?? undefined;
+    const typeKey = interaction.options.getString('type', true) as keyof typeof channelTypes;
+    const type: ProvisionedChannelType = channelTypes[typeKey];
+    const category = categoryName ? findCategory(interaction.guild, categoryName) : undefined;
 
-    if (kind === 'category') {
-      const type = channelTypes.category;
-      if (findChannelByNameAndType(interaction.guild, name, type)) {
-        await interaction.reply({
-          content: `Une catégorie ${name} existe déjà.`,
-          ephemeral: true,
-        });
-        return;
-      }
-
-      const roles = new RoleService().configuredRoleMap(interaction.guild);
-      const permissionService = new PermissionService();
-      await interaction.guild.channels.create({
-        name,
-        type,
-        permissionOverwrites: permissionService.categoryOverwrites(
-          categoryConfigFromProfile(name, profile),
-          { guild: interaction.guild, roles },
-        ),
-        reason: `Catégorie créée par ${interaction.user.tag}`,
+    if (categoryName && !category) {
+      await interaction.reply({
+        content: `Catégorie introuvable : ${categoryName}`,
+        ephemeral: true,
       });
-      await interaction.reply({ content: `Catégorie créée : ${name}`, ephemeral: true });
       return;
     }
 
-    const type = channelTypes[kind];
-    if (findChannelByNameAndType(interaction.guild, name, type)) {
+    const existing = category
+      ? findChannelInCategory(interaction.guild, name, type, category.id)
+      : findChannelByNameAndType(interaction.guild, name, type);
+    if (existing) {
       await interaction.reply({
-        content: `Un élément ${name} de ce type existe déjà.`,
+        content: `Un salon ${name} de ce type existe déjà.`,
         ephemeral: true,
       });
       return;
     }
 
     const roles = new RoleService().configuredRoleMap(interaction.guild);
-    const parent = parentName ? findCategory(interaction.guild, parentName) : undefined;
-    if (parentName && !parent) {
-      await interaction.reply({
-        content: `Catégorie introuvable : ${parentName}`,
-        ephemeral: true,
-      });
-      return;
-    }
+    const channel = await new ChannelService().createManualChannel(interaction.guild, roles, {
+      name,
+      categoryName,
+      type,
+      memberOnly: interaction.options.getBoolean('member-only') ?? true,
+      staffOnly: interaction.options.getBoolean('staff-only') ?? false,
+      readonly: interaction.options.getBoolean('readonly') ?? false,
+    });
 
-    const channelConfig = channelConfigFromProfile(name, type, profile);
-    const created = await createGuildChannel(interaction.guild, channelConfig, roles, parent);
-    await interaction.reply({ content: `Salon créé : ${created.name}`, ephemeral: true });
+    await interaction.reply({ content: `Salon créé : ${channel.name}`, ephemeral: true });
   },
 };
-
-function categoryConfigFromProfile(name: string, profile: PermissionProfile): CategoryConfig {
-  return {
-    name,
-    staffOnly: profile === 'staff',
-    memberOnly: profile === 'member' || profile === 'bot',
-    channels: [],
-  };
-}
-
-function channelConfigFromProfile(
-  name: string,
-  type: ChannelType.GuildText | ChannelType.GuildVoice,
-  profile: PermissionProfile,
-): ChannelConfig {
-  return {
-    name,
-    type,
-    readonly: profile === 'public-readonly',
-    memberOnly: profile === 'member' || profile === 'bot',
-    staffOnly: profile === 'staff',
-    botAccess: profile === 'bot',
-  };
-}
-
-async function createGuildChannel(
-  guild: Guild,
-  channelConfig: ChannelConfig,
-  roles: Map<string, Role>,
-  parent?: CategoryChannel,
-): Promise<GuildBasedChannel> {
-  return guild.channels.create({
-    name: channelConfig.name,
-    type: channelConfig.type,
-    parent: parent?.id,
-    permissionOverwrites: new PermissionService().channelOverwrites(channelConfig, {
-      guild,
-      roles,
-    }),
-    reason: 'Création manuelle par commande de provisioning',
-  });
-}

@@ -1,18 +1,21 @@
-const format = (level: string, message: string): string => {
-  const timestamp = new Date().toISOString();
-  return `[${timestamp}] [${level}] ${message}`;
-};
+const timestamp = () => new Date().toISOString();
 
 export const logger = {
-  info: (message: string) => console.log(format('INFO', message)),
-  success: (message: string) => console.log(format('SUCCESS', message)),
-  warn: (message: string) => console.warn(format('WARN', message)),
-  error: (message: string, error?: unknown) => {
-    console.error(format('ERROR', message));
+  info(message: string): void {
+    console.log(`[${timestamp()}] [INFO] ${message}`);
+  },
+  success(message: string): void {
+    console.log(`[${timestamp()}] [OK] ${message}`);
+  },
+  warn(message: string): void {
+    console.warn(`[${timestamp()}] [WARN] ${message}`);
+  },
+  error(message: string, error?: unknown): void {
+    console.error(`[${timestamp()}] [ERROR] ${message}`);
     if (error instanceof Error) {
       console.error(error.stack ?? error.message);
-    } else if (error) {
-      console.error(error);
+      return;
     }
+    if (error) console.error(error);
   },
 };

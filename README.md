@@ -1,121 +1,50 @@
-# 답답한 분위기 V2 — Bot Discord privé
+# 답답한 분위기 V2 — Provisioning Bot
 
-Bot Discord en **Node.js + TypeScript + discord.js** pour provisionner un serveur privé nommé **답답한 분위기 V2**.
+Bot Discord en **Node.js + TypeScript + discord.js v14** pour provisionner et maintenir la structure du serveur privé **답답한 분위기 V2**.
 
-Le bot custom est un outil d’infrastructure : il crée, audite, synchronise, exporte et ajuste la structure du serveur. Il ne gère pas la vie quotidienne du serveur.
+Ce bot est volontairement limité : il crée, synchronise, audite, exporte et ajuste l’infrastructure du serveur. Il ne gère pas la vie quotidienne.
 
-## Stack
+## Ce que le bot ne fait pas
 
-- Node.js 20+
-- TypeScript
-- discord.js v14
-- dotenv
-- eslint
-- prettier
+- Pas de validation automatique des membres.
+- Pas de message automatique à l’arrivée.
+- Pas de `guildMemberAdd` ou `guildMemberRemove`.
+- Pas de menus/boutons pour attribuer des rôles.
+- Pas de tickets, musique, statistiques, events ou vocaux temporaires.
+- Pas de `MessageContent`.
+- Pas de `GuildMembers`.
 
-## 1. Créer l’application Discord
+Ces usages sont documentés dans [docs/BOTS.md](docs/BOTS.md) et doivent être confiés à des bots externes.
+
+## Création de l’application Discord
 
 1. Va sur le [Discord Developer Portal](https://discord.com/developers/applications).
-2. Clique sur **New Application**.
-3. Donne-lui un nom clair, par exemple `Stuffy Vibe V2 Bot`.
-4. Ouvre l’application créée.
+2. Crée une application.
+3. Ajoute un bot dans l’onglet **Bot**.
+4. Copie le token du bot.
+5. Ne donne pas `Administrator` par défaut.
 
-## 2. Créer le bot
+## Configuration `.env`
 
-1. Dans l’application, ouvre l’onglet **Bot**.
-2. Clique sur **Add Bot**.
-3. Configure son nom et son avatar si besoin.
-4. Ne donne pas la permission **Administrator** par défaut.
-
-## 3. Récupérer le token
-
-1. Onglet **Bot**.
-2. Clique sur **Reset Token** si nécessaire.
-3. Copie le token.
-4. Garde-le privé : ne l’envoie jamais et ne le commit jamais.
-
-## 4. Intents Discord
-
-Le bot utilise uniquement `GatewayIntentBits.Guilds`.
-
-`Server Members Intent` et `Message Content Intent` ne sont pas nécessaires pour ce mode provisioning.
-
-## 5. Configurer `.env`
-
-Copie le fichier d’exemple :
+Copie l’exemple :
 
 ```bash
 cp .env.example .env
 ```
 
-Remplis ensuite :
+Remplis :
 
 ```env
 DISCORD_TOKEN=ton_token_discord
-CLIENT_ID=id_de_l_application
-GUILD_ID=id_du_serveur_prive
+CLIENT_ID=id_application
+GUILD_ID=id_serveur
 ```
 
-> ⚠️ Ne versionne jamais `.env`. Il est ignoré par `.gitignore`.
+Ne partage jamais le token et ne commit jamais `.env`.
 
-## 6. Installer les dépendances
+## Permissions minimales du bot
 
-```bash
-npm install
-```
-
-## 7. Lancer en développement
-
-```bash
-npm run dev
-```
-
-## 8. Déployer les commandes slash
-
-Les commandes sont déployées uniquement sur le serveur défini par `GUILD_ID` pour faciliter le développement.
-
-```bash
-npm run deploy-commands
-```
-
-## 9. Utiliser `/setup`
-
-Dans Discord, lance :
-
-```text
-/setup
-```
-
-La commande :
-
-- renomme le serveur en `답답한 분위기 V2` ;
-- crée les rôles manquants ;
-- crée les catégories manquantes ;
-- crée les salons manquants ;
-- applique les permissions attendues ;
-- reste idempotente : les éléments existants ne sont pas recréés.
-
-Accès autorisé à `/setup` :
-
-- propriétaire du serveur ;
-- rôle `神 (Fondateur)` ;
-- administrateurs.
-
-Le rôle `神 (Fondateur)` est protégé : s’il existe déjà, le bot ne le modifie pas sans confirmation humaine.
-
-## 10. Validation des membres
-
-La validation se fait directement dans `📜・règlement` avec Sapphire ou Carl-bot.
-
-Le bot custom crée le rôle `🕯️・À valider` et prépare les permissions :
-
-- `@everyone` et `🕯️・À valider` voient seulement `👋・bienvenue`, `📜・règlement` et `🧭・guide`.
-- `🎭・rôles` devient visible uniquement après obtention du rôle `✅・Membre`.
-- Le salon `✅・validation` n’est pas utilisé.
-
-## 11. Permissions minimales recommandées pour inviter le bot
-
-Évite `Administrator`. Utilise plutôt les permissions nécessaires :
+Invite le bot avec :
 
 - Manage Roles
 - Manage Channels
@@ -126,40 +55,73 @@ Le bot custom crée le rôle `🕯️・À valider` et prépare les permissions 
 - Read Message History
 - Use Application Commands
 
-Le rôle du bot doit être placé au-dessus des rôles qu’il doit gérer, notamment `神 (Fondateur)` si tu veux que le bot puisse le positionner juste sous lui lors de la première création.
+Place le rôle du bot au-dessus des rôles qu’il doit créer ou positionner. Le rôle `神 (Fondateur)` est placé le plus haut possible sous le rôle du bot.
 
-## 12. Commandes disponibles
+Le rôle `神 (Fondateur)` est créé sans permission `Administrator`. Si tu veux lui ajouter `Administrator`, fais-le manuellement après `/setup`.
 
-- `/setup` : crée et synchronise la structure du serveur.
-- `/audit` : liste rôles, catégories, salons et permissions critiques manquantes.
-- `/sync` : synchronise la structure déclarée dans `src/config/server.config.ts`.
-- `/sync-permissions` : synchronise uniquement les permissions des éléments existants.
-- `/create-channel` : crée un salon texte, vocal ou une catégorie.
-- `/delete-channel` : supprime un salon texte, vocal ou une catégorie par nom et type.
+## Installation
+
+```bash
+npm install
+```
+
+## Déployer les commandes
+
+```bash
+npm run deploy-commands
+```
+
+Les commandes sont déployées sur le serveur indiqué par `GUILD_ID`.
+
+## Lancer en développement
+
+```bash
+npm run dev
+```
+
+## Commandes principales
+
+- `/setup` : crée rôles, catégories, salons et permissions sans supprimer l’existant.
+- `/audit` : compare le serveur réel avec la configuration attendue.
+- `/sync dry-run force` : synchronise la structure, avec mode dry-run possible.
+- `/sync-permissions dry-run` : réapplique uniquement les permissions.
+- `/create-channel` : crée un salon texte, vocal ou forum.
+- `/delete-channel channel confirm` : supprime seulement si `confirm` vaut `CONFIRM`.
 - `/create-role` : crée un rôle sans permission `Administrator`.
-- `/delete-role` : supprime un rôle non protégé.
-- `/export-config` : exporte la configuration attendue en JSON.
-- `/embed-rules` : envoie l’embed du règlement dans `📜・règlement`.
-- `/embed-welcome` : envoie un embed fixe de présentation dans `👋・bienvenue`.
-- `/embed-guide` : envoie le guide dans `🧭・guide`.
-- `/embed-roles` : envoie un embed statique de rôles dans `🎭・rôles`.
+- `/delete-role role confirm` : supprime seulement si `confirm` vaut `CONFIRM`.
+- `/export-config` : exporte la structure actuelle dans `exports/server-config-YYYY-MM-DD.json`.
+- `/embed-entry` : envoie les embeds statiques bienvenue, règlement et guide.
+- `/embed-bot-plan` : envoie le plan des bots externes dans `⚙️・bot-config`.
 
-## 13. Bots externes prévus
+## Forums
 
-La structure prévoit des salons pour déléguer les fonctionnalités quotidiennes :
+Le bot tente de créer des salons forum pour `🎞️・clips`, `💡・suggestions` et `🎨・créatif`. Active **Community** dans Discord avant `/setup` si tu veux les forums et outils communautaires. Si la création d’un forum échoue, le bot crée un salon texte et log un avertissement.
 
-- Sapphire ou Carl-bot : validation, rôles, logs simples.
-- Ticket Tool : tickets.
-- VoiceMaster : vocaux temporaires.
-- Sesh : events.
-- Statbot : stats.
-- PatchBot : patch notes.
-- FreeStuff : free games.
-- Starboard : best-of.
+## Parcours membre
 
-Le bot custom ne gère pas la validation dynamique, l’attribution dynamique des rôles, les messages de bienvenue live, les tickets, les events, les logs avancés, les stats ou la musique.
+Le nouveau membre voit seulement `👋・bienvenue`, `📜・règlement` et `🧭・guide`. La validation est prévue directement dans `📜・règlement`, via Sapphire ou Carl-bot. Une fois le rôle `✅・Membre` reçu, il débloque le serveur principal et peut accéder à `🎭・rôles`.
 
-## 14. Scripts npm
+Voir [docs/USER_JOURNEY.md](docs/USER_JOURNEY.md).
+
+## Bots externes
+
+Configure manuellement les bots externes après le provisioning :
+
+- Sapphire ou Carl-bot pour validation, rôles, embeds et logs simples.
+- Ticket Tool pour tickets et signalements.
+- VoiceMaster ou TempVoice pour vocaux temporaires.
+- Sesh ou Apollo pour events.
+- Statbot pour stats.
+- PatchBot pour patch notes.
+- FreeStuff pour jeux gratuits.
+- Starboard pour best-of.
+- EasyPoll ou Pollmaster pour sondages.
+- Jockie Music ou Kenku FM pour musique.
+- Beemo, Double Counter ou Wick pour sécurité si besoin.
+
+Voir [docs/BOTS.md](docs/BOTS.md).
+
+## Scripts
 
 ```bash
 npm run dev
@@ -172,7 +134,7 @@ npm run deploy-commands
 
 ## Sécurité
 
-- Ne hardcode jamais le token Discord.
-- Ne partage jamais le fichier `.env`.
-- N’accorde pas `Administrator` au bot par défaut.
-- Déploie les commandes uniquement sur ton serveur privé pendant le développement.
+- Ne hardcode jamais le token.
+- Ne versionne jamais `.env`.
+- Ne donne pas `Administrator` inutilement au bot custom ou aux bots externes.
+- Utilise `/audit` après chaque gros changement manuel.

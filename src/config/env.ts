@@ -1,19 +1,21 @@
 import 'dotenv/config';
 
-type EnvKey = 'DISCORD_TOKEN' | 'CLIENT_ID' | 'GUILD_ID';
+interface Env {
+  discordToken: string;
+  clientId: string;
+  guildId: string;
+}
 
-function getRequiredEnv(key: EnvKey): string {
-  const value = process.env[key];
-
+function requireEnv(name: string): string {
+  const value = process.env[name];
   if (!value) {
-    throw new Error(`Variable d'environnement manquante: ${key}`);
+    throw new Error(`Variable d'environnement manquante: ${name}`);
   }
-
   return value;
 }
 
-export const env = {
-  discordToken: getRequiredEnv('DISCORD_TOKEN'),
-  clientId: getRequiredEnv('CLIENT_ID'),
-  guildId: getRequiredEnv('GUILD_ID'),
+export const env: Env = {
+  discordToken: requireEnv('DISCORD_TOKEN'),
+  clientId: requireEnv('CLIENT_ID'),
+  guildId: requireEnv('GUILD_ID'),
 };

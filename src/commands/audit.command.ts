@@ -1,38 +1,47 @@
 import { EmbedBuilder, SlashCommandBuilder } from 'discord.js';
 import type { SlashCommand } from './command.js';
-import { BRANDING } from '../config/server.config.js';
+import { BRANDING } from '../config/branding.config.js';
 import { AuditService } from '../services/audit.service.js';
-import { hasSetupAccess } from '../utils/permissions.js';
-
-const formatList = (items: string[]) =>
-  items.length ? items.map((item) => `• ${item}`).join('\n') : 'Aucun élément manquant.';
+import { formatList, truncate } from '../utils/format.js';
+import { hasProvisioningAccess } from '../utils/permissions.js';
 
 export const auditCommand: SlashCommand = {
   data: new SlashCommandBuilder()
     .setName('audit')
-    .setDescription('Compare le serveur avec la configuration attendue.'),
+    .setDescription('Compare le serveur réel avec la configuration attendue sans modifier.'),
   async execute(interaction) {
-    if (!hasSetupAccess(interaction)) {
+    if (!hasProvisioningAccess(interaction)) {
       await interaction.reply({ content: 'Accès refusé.', ephemeral: true });
       return;
     }
     if (!interaction.guild) throw new Error('Commande utilisable uniquement dans un serveur.');
+
     const report = new AuditService().run(interaction.guild);
     const embed = new EmbedBuilder()
-      .setColor(BRANDING.primaryColor)
-      .setTitle('Audit de structure')
+      .setColor(BRANDING.colors.midnightBlue)
+      .setTitle('Audit provisioning')
       .addFields(
-        { name: 'Rôles manquants', value: formatList(report.missingRoles).slice(0, 1024) },
+        { name: 'Rôles manquants', value: truncate(formatList(report.missingRoles, 'Aucun.')) },
         {
           name: 'Catégories manquantes',
-          value: formatList(report.missingCategories).slice(0, 1024),
+          value: truncate(formatList(report.missingCategories, 'Aucune.')),
         },
-        { name: 'Salons manquants', value: formatList(report.missingChannels).slice(0, 1024) },
+        {
+          name: 'Salons manquants',
+          value: truncate(formatList(report.missingChannels, 'Aucun.')),
+        },
         {
           name: 'Permissions critiques',
-          value: formatList(report.criticalPermissions).slice(0, 1024),
+          value: truncate(formatList(report.permissionIssues, 'Aucun problème détecté.')),
         },
-      );
+        {
+          name: 'Doublons problématiques',
+          value: truncate(formatList(report.duplicateIssues, 'Aucun doublon problématique.')),
+        },
+      )
+      .setFooter({ text: BRANDING.footer })
+      .setTimestamp();
+
     await interaction.reply({ embeds: [embed], ephemeral: true });
   },
 };
