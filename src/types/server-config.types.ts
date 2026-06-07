@@ -30,6 +30,7 @@ export interface ChannelConfig {
   type: ProvisionedChannelType;
   fallbackType?: ChannelType.GuildText;
   profile: PermissionProfile;
+  botRoles?: string[];
   topic?: string;
   reason?: string;
 }
@@ -37,6 +38,7 @@ export interface ChannelConfig {
 export interface CategoryConfig {
   name: string;
   profile: 'entry' | 'member' | 'staff' | 'bots';
+  botRoles?: string[];
   channels: ChannelConfig[];
 }
 

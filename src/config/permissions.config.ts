@@ -53,7 +53,7 @@ export const ADMIN_ALLOW = [
   PermissionFlagsBits.ManageRoles,
 ];
 
-export const BOT_ALLOW = [
+export const PROVISIONING_BOT_ALLOW = [
   PermissionFlagsBits.ViewChannel,
   PermissionFlagsBits.SendMessages,
   PermissionFlagsBits.EmbedLinks,
@@ -62,4 +62,47 @@ export const BOT_ALLOW = [
   PermissionFlagsBits.ManageMessages,
   PermissionFlagsBits.Connect,
   PermissionFlagsBits.Speak,
+];
+
+export const BOT_READ_ALLOW = [
+  PermissionFlagsBits.ViewChannel,
+  PermissionFlagsBits.ReadMessageHistory,
+];
+
+export const BOT_TEXT_ALLOW = [
+  PermissionFlagsBits.ViewChannel,
+  PermissionFlagsBits.SendMessages,
+  PermissionFlagsBits.EmbedLinks,
+  PermissionFlagsBits.AttachFiles,
+  PermissionFlagsBits.ReadMessageHistory,
+];
+
+export const BOT_MODERATION_ALLOW = [
+  ...BOT_TEXT_ALLOW,
+  PermissionFlagsBits.AddReactions,
+  PermissionFlagsBits.ManageMessages,
+];
+
+export const BOT_TICKETS_ALLOW = [
+  ...BOT_TEXT_ALLOW,
+  PermissionFlagsBits.ManageMessages,
+  PermissionFlagsBits.ManageChannels,
+];
+
+export const BOT_VOICE_ALLOW = [
+  PermissionFlagsBits.ViewChannel,
+  PermissionFlagsBits.Connect,
+  PermissionFlagsBits.Speak,
+  PermissionFlagsBits.MoveMembers,
+  PermissionFlagsBits.ManageChannels,
+];
+
+export const BOT_MUSIC_ALLOW = [
+  PermissionFlagsBits.ViewChannel,
+  PermissionFlagsBits.SendMessages,
+  PermissionFlagsBits.EmbedLinks,
+  PermissionFlagsBits.ReadMessageHistory,
+  PermissionFlagsBits.Connect,
+  PermissionFlagsBits.Speak,
+  PermissionFlagsBits.UseVAD,
 ];

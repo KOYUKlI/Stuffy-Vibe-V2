@@ -58,6 +58,7 @@ export class AuditService {
     const entryNames: string[] = [CHANNEL_NAMES.welcome, CHANNEL_NAMES.rules, CHANNEL_NAMES.guide];
 
     for (const channel of guild.channels.cache.values()) {
+      if (channel.type === ChannelType.GuildCategory) continue;
       if (!('permissionsFor' in channel)) continue;
 
       const isEntry = entryNames.includes(channel.name);

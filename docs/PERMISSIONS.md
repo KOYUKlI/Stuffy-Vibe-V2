@@ -36,16 +36,20 @@ Il peut écrire dans les salons membres, réagir, envoyer images/liens et rejoin
 
 ## Bots
 
-`🤖・Bot` et le membre bot custom ont accès aux salons utiles :
+`🤖・Bot` est un rôle commun d’identification. Il ne doit pas concentrer toutes les permissions.
 
-- `🤖・commandes`
-- `⚙️・bot-config`
-- `🧾・logs`
-- `🎫・tickets`
-- `📊・stats`
-- `📰・patch-notes`
-- `🎁・free-games`
-- `⭐・best-of`
+Chaque bot externe reçoit `🤖・Bot` plus un rôle spécialisé :
+
+- `🛠️・Bot Modération` : `📜・règlement`, `🎭・rôles`, `🧾・logs`, `⚙️・bot-config`. Peut envoyer messages, embeds, réactions, gérer les messages et gérer les rôles si nécessaire.
+- `🎫・Bot Tickets` : `🎫・tickets`, `🚨・signalements`, `🧾・logs`. Peut gérer les salons nécessaires aux tickets.
+- `🔊・Bot Vocal` : `➕・créer-un-vocal` et catégorie `🔊・VOCAUX`. Peut gérer les vocaux temporaires.
+- `📅・Bot Events` : `📅・events`, `📌・annonces-potes`. Peut envoyer messages et embeds.
+- `📊・Bot Stats` : `📊・stats`, `🧾・logs`. Peut envoyer messages et embeds.
+- `📰・Bot News` : `📰・patch-notes`, `🎁・free-games`. Peut envoyer messages et embeds.
+- `⭐・Bot Starboard` : lecture des salons membres nécessaires et écriture dans `⭐・best-of`.
+- `🎵・Bot Music` : `🎵・musique-bot` et `🎧・music`. Peut se connecter et parler.
+
+Les rôles bots spécialisés restent sous `神 (Fondateur)`, `🛡️・Admin` et `🔧・Modérateur`.
 
 ## Muted
 

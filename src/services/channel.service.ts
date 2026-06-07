@@ -45,7 +45,13 @@ export class ChannelService {
       if (!category) continue;
 
       for (const channelConfig of categoryConfig.channels) {
-        await this.ensureChannel(guild, category, channelConfig, roles, dryRun);
+        await this.ensureChannel(
+          guild,
+          category,
+          this.withInheritedBotRoles(channelConfig, categoryConfig.botRoles),
+          roles,
+          dryRun,
+        );
       }
     }
   }
@@ -72,7 +78,11 @@ export class ChannelService {
       }
 
       for (const channelConfig of categoryConfig.channels) {
-        const channel = this.findExpectedChannel(guild, category.id, channelConfig);
+        const channelWithBotRoles = this.withInheritedBotRoles(
+          channelConfig,
+          categoryConfig.botRoles,
+        );
+        const channel = this.findExpectedChannel(guild, category.id, channelWithBotRoles);
         if (!channel || !('permissionOverwrites' in channel)) {
           logger.warn(`Salon absent, permissions ignorées: ${channelConfig.name}`);
           continue;
@@ -84,7 +94,7 @@ export class ChannelService {
         }
 
         await channel.permissionOverwrites.set(
-          this.permissionService.channelOverwrites(channelConfig, { guild, roles }),
+          this.permissionService.channelOverwrites(channelWithBotRoles, { guild, roles }),
           'Synchronisation permissions salon',
         );
         logger.info(`Permissions salon synchronisées: ${channelConfig.name}`);
@@ -158,6 +168,16 @@ export class ChannelService {
         ? findChannelInCategory(guild, channelConfig.name, channelConfig.fallbackType, parentId)
         : undefined)
     );
+  }
+
+  private withInheritedBotRoles(
+    channelConfig: ChannelConfig,
+    categoryBotRoles: string[] = [],
+  ): ChannelConfig {
+    return {
+      ...channelConfig,
+      botRoles: [...new Set([...categoryBotRoles, ...(channelConfig.botRoles ?? [])])],
+    };
   }
 
   private async createChannelWithFallback(
