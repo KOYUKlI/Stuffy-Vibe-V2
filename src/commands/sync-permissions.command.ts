@@ -19,9 +19,11 @@ export const syncPermissionsCommand: SlashCommand = {
 
     const dryRun = interaction.options.getBoolean('dry-run') ?? false;
     await interaction.deferReply({ ephemeral: true });
-    await new SyncService().syncPermissions(interaction.guild, dryRun);
+    const result = await new SyncService().syncPermissions(interaction.guild, dryRun);
     await interaction.editReply(
-      dryRun ? 'Dry-run permissions terminé. Consulte les logs.' : 'Permissions synchronisées.',
+      dryRun
+        ? 'Dry-run permissions terminé. Aucun changement appliqué.'
+        : `Permissions synchronisées.\nBackup : ${result.backupPath}`,
     );
   },
 };

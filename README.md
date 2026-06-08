@@ -2,7 +2,7 @@
 
 Bot Discord en **Node.js + TypeScript + discord.js v14** pour provisionner et maintenir la structure du serveur privé **답답한 분위기 V2**.
 
-Ce bot est volontairement limité : il crée, synchronise, audite, exporte et ajuste l’infrastructure du serveur. Il ne gère pas la vie quotidienne.
+Ce bot est volontairement limité : il crée, synchronise, audite, exporte et ajuste l’infrastructure du serveur. Il ne gère pas la vie quotidienne et peut être arrêté après `/setup` ou après une opération de maintenance.
 
 ## Ce que le bot ne fait pas
 
@@ -79,9 +79,11 @@ Les commandes sont déployées sur le serveur indiqué par `GUILD_ID`.
 npm run dev
 ```
 
+Lance le bot uniquement quand tu dois provisionner ou maintenir la structure. Une fois l’opération terminée, tu peux l’arrêter sans casser le serveur : les rôles, salons et permissions restent dans Discord.
+
 ## Commandes principales
 
-- `/setup` : crée rôles, catégories, salons et permissions sans supprimer l’existant.
+- `/setup dry-run` : crée rôles, catégories, salons et permissions sans supprimer l’existant.
 - `/audit` : compare le serveur réel avec la configuration attendue.
 - `/sync dry-run force` : synchronise la structure, avec mode dry-run possible.
 - `/sync-permissions dry-run` : réapplique uniquement les permissions.
@@ -89,9 +91,9 @@ npm run dev
 - `/delete-channel channel confirm` : supprime seulement si `confirm` vaut `CONFIRM`.
 - `/create-role` : crée un rôle sans permission `Administrator`.
 - `/delete-role role confirm` : supprime seulement si `confirm` vaut `CONFIRM`.
-- `/export-config` : exporte la structure actuelle dans `exports/server-config-YYYY-MM-DD.json`.
-- `/embed-entry` : envoie les embeds statiques bienvenue, règlement et guide.
-- `/embed-bot-plan` : envoie le plan des bots externes dans `⚙️・bot-config`.
+- `/export-config` : exporte la structure actuelle dans `exports/server-config-*.json`.
+
+Avant `/setup`, `/sync` et `/sync-permissions` en mode réel, le bot crée automatiquement un backup dans `exports/`. Aucun backup n’est créé en `dry-run`.
 
 ## Forums
 
@@ -107,7 +109,7 @@ Voir [docs/USER_JOURNEY.md](docs/USER_JOURNEY.md).
 
 Configure manuellement les bots externes après le provisioning :
 
-- Sapphire ou Carl-bot pour validation, rôles, embeds et logs simples.
+- Sapphire ou Carl-bot pour validation, rôles, embeds permanents et logs simples.
 - Ticket Tool pour tickets et signalements.
 - VoiceMaster ou TempVoice pour vocaux temporaires.
 - Sesh ou Apollo pour events.
@@ -120,6 +122,11 @@ Configure manuellement les bots externes après le provisioning :
 - Beemo, Double Counter ou Wick pour sécurité si besoin.
 
 Voir [docs/BOTS.md](docs/BOTS.md).
+Voir aussi [docs/CARL_BOT_SETUP.md](docs/CARL_BOT_SETUP.md) pour la configuration manuelle de Carl-bot.
+
+## Opérations
+
+Le guide d’exploitation est dans [docs/OPERATIONS.md](docs/OPERATIONS.md). Il explique quand lancer le bot, quand utiliser `/setup`, `/sync`, `/sync-permissions`, comment créer un backup et comment revenir en arrière manuellement.
 
 ## Scripts
 

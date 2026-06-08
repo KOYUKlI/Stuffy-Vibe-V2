@@ -10,7 +10,7 @@ interface ExportResult {
 }
 
 export class ExportService {
-  public async exportGuild(guild: Guild): Promise<ExportResult> {
+  public async exportGuild(guild: Guild, prefix = 'server-config'): Promise<ExportResult> {
     const payload = {
       exportedAt: new Date().toISOString(),
       guild: {
@@ -38,8 +38,8 @@ export class ExportService {
     const exportsDir = resolve(process.cwd(), 'exports');
     await mkdir(exportsDir, { recursive: true });
 
-    const date = new Date().toISOString().slice(0, 10);
-    const filePath = resolve(exportsDir, `server-config-${date}.json`);
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const filePath = resolve(exportsDir, `${prefix}-${timestamp}.json`);
     await writeFile(filePath, JSON.stringify(payload, null, 2), 'utf8');
 
     return {

@@ -28,9 +28,9 @@ Puis :
 
 ```text
 /audit
-/embed-entry
-/embed-bot-plan
 ```
+
+Les embeds permanents de règlement, validation, rôles ou plan des bots sont à créer manuellement avec Carl-bot ou Sapphire. Le bot custom ne publie plus de messages permanents.
 
 ## Après `/setup`
 
@@ -43,3 +43,4 @@ Configure manuellement :
 - Statbot, PatchBot, FreeStuff et Starboard dans leurs salons dédiés.
 
 Le bot custom reste un outil d’infrastructure.
+Une fois `/setup` terminé, tu peux l’arrêter.

@@ -4,8 +4,6 @@ import { createChannelCommand } from './create-channel.command.js';
 import { createRoleCommand } from './create-role.command.js';
 import { deleteChannelCommand } from './delete-channel.command.js';
 import { deleteRoleCommand } from './delete-role.command.js';
-import { embedBotPlanCommand } from './embed-bot-plan.command.js';
-import { embedEntryCommand } from './embed-entry.command.js';
 import { exportConfigCommand } from './export-config.command.js';
 import { setupCommand } from './setup.command.js';
 import { syncCommand } from './sync.command.js';
@@ -21,8 +19,6 @@ export const commands = [
   createRoleCommand,
   deleteRoleCommand,
   exportConfigCommand,
-  embedEntryCommand,
-  embedBotPlanCommand,
 ] satisfies SlashCommand[];
 
 export const commandMap = new Map(commands.map((command) => [command.data.name, command]));

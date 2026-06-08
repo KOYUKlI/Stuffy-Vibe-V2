@@ -24,7 +24,11 @@ export const syncCommand: SlashCommand = {
     const force = interaction.options.getBoolean('force') ?? false;
 
     await interaction.deferReply({ ephemeral: true });
-    await new SyncService().sync(interaction.guild, { dryRun, force });
-    await interaction.editReply(dryRun ? 'Dry-run terminé. Consulte les logs.' : 'Sync terminé.');
+    const result = await new SyncService().sync(interaction.guild, { dryRun, force });
+    await interaction.editReply(
+      dryRun
+        ? 'Dry-run terminé. Aucun changement appliqué.'
+        : `Sync terminé.\nBackup : ${result.backupPath}`,
+    );
   },
 };

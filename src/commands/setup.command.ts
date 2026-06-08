@@ -6,7 +6,10 @@ import { hasProvisioningAccess } from '../utils/permissions.js';
 export const setupCommand: SlashCommand = {
   data: new SlashCommandBuilder()
     .setName('setup')
-    .setDescription('Crée la structure complète du serveur sans supprimer l’existant.'),
+    .setDescription('Crée la structure complète du serveur sans supprimer l’existant.')
+    .addBooleanOption((option) =>
+      option.setName('dry-run').setDescription('Afficher ce qui serait fait sans modifier.'),
+    ),
   async execute(interaction) {
     if (!hasProvisioningAccess(interaction)) {
       await interaction.reply({ content: 'Accès refusé.', ephemeral: true });
@@ -15,7 +18,12 @@ export const setupCommand: SlashCommand = {
     if (!interaction.guild) throw new Error('Commande utilisable uniquement dans un serveur.');
 
     await interaction.deferReply({ ephemeral: true });
-    await new SetupService().run(interaction.guild);
-    await interaction.editReply('Setup terminé : structure et permissions synchronisées.');
+    const dryRun = interaction.options.getBoolean('dry-run') ?? false;
+    const result = await new SetupService().run(interaction.guild, dryRun);
+    await interaction.editReply(
+      dryRun
+        ? 'Dry-run setup terminé. Aucun changement appliqué.'
+        : `Setup terminé : structure et permissions synchronisées.\nBackup : ${result.backupPath}`,
+    );
   },
 };
