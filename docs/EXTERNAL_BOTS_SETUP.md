@@ -17,16 +17,20 @@ Le bot custom du projet reste un provisioning bot : il prépare la structure, le
 
 ## Ordre d’installation recommandé
 
-1. Carl-bot ou Sapphire
-2. Ticket Tool
-3. VoiceMaster ou TempVoice
-4. Sesh ou Apollo
-5. Statbot
+1. Carl-bot
+2. Dyno
+3. Ticket Tool
+4. VoiceMaster
+5. Sesh
 6. PatchBot
 7. FreeStuff
-8. Starboard
-9. EasyPoll ou Pollmaster
-10. Jockie Music ou Kenku FM
+8. Starboard dédié seulement si nécessaire
+9. Statbot après quelques jours
+10. EasyPoll après quelques jours
+11. Kenku FM ou Jockie Music, choisir un seul
+12. Beemo seulement si besoin sécurité
+13. Wick seulement si besoin anti-nuke/anti-raid lourd
+14. Double Counter seulement si problème d’alts/VPN
 
 ## Permissions minimales communes
 
@@ -39,21 +43,25 @@ Selon le bot, commence par :
 - Read Message History
 - Add Reactions si le bot utilise des réactions
 - Use External Emojis si nécessaire
-- Manage Messages seulement pour logs, starboard ou modération légère
-- Manage Roles seulement pour Carl-bot/Sapphire quand ils attribuent des rôles
+- Manage Messages seulement pour Dyno, logs, starboard ou modération légère
+- Manage Roles seulement pour Carl-bot quand il attribue des rôles
 - Move Members et Manage Channels seulement pour VoiceMaster/TempVoice
 
 Évite `Administrator`. Si un bot demande trop de permissions, limite-le avec les permissions de salon.
 
-## 1. Carl-bot ou Sapphire
+## 1. Carl-bot
 
 Objectif :
 
+- Autorole `🕯️・À valider`.
+- Greetings dans `👋・bienvenue`.
+- DM de bienvenue optionnel.
 - Validation du règlement.
 - Attribution du rôle `✅・Membre`.
 - Retrait du rôle `🕯️・À valider`.
-  - Sélection de rôles dans `🎭・rôles`.
-- Logs simples dans `🧾・logs`.
+- Sélection de rôles dans `🎭・rôles`.
+
+Carl-bot ne gère pas l’automod, les tickets, les vocaux temporaires, les events, les stats ou la musique.
 
 Rôles à attribuer :
 
@@ -62,9 +70,10 @@ Rôles à attribuer :
 
 Salons :
 
+- Greetings : `👋・bienvenue`
 - Règlement : `📜・règlement`
 - Rôles : `🎭・rôles`
-- Logs : `🧾・logs`
+- Logs nécessaires : `🧾・logs`
 
 Permissions minimales :
 
@@ -100,14 +109,71 @@ Configuration rôles :
 
 Checklist de test :
 
+- Un nouveau membre reçoit `🕯️・À valider`.
+- Le greeting apparaît dans `👋・bienvenue`.
 - Un membre non validé voit seulement `👋・bienvenue`, `📜・règlement`, `🧭・guide`.
 - Le bouton/réaction de validation ajoute `✅・Membre`.
 - Le bouton/réaction retire `🕯️・À valider`.
 - `🎭・rôles` devient visible après validation.
 - Les rôles sélectionnés dans `🎭・rôles` s’ajoutent et se retirent correctement.
-- Les logs apparaissent dans `🧾・logs`.
+- Carl-bot ne gère pas l’automod.
 
-## 2. Ticket Tool
+## 2. Dyno
+
+Objectif :
+
+- automod spécialisé ;
+- anti-spam ;
+- anti-mentions massives ;
+- anti-invites Discord externes ;
+- anti-liens suspects si besoin ;
+- logs automod.
+
+Dyno ne doit pas gérer les rôles de validation ni les reaction roles.
+
+Rôles :
+
+- `🤖・Bot`
+- `🛡️・Bot Automod`
+
+Le rôle `🛡️・Bot Automod` n’existe pas encore dans la configuration TypeScript actuelle. Ajoute-le à `src/config/roles.config.ts` lors d’une prochaine sync.
+
+Salons :
+
+- Logs : `🧾・logs`
+- Config staff : `⚙️・bot-config`
+
+Permissions minimales :
+
+- View Channels
+- Send Messages
+- Embed Links
+- Read Message History
+- Manage Messages
+- Moderate Members si timeout automatique utilisé
+- Mention Roles seulement si nécessaire
+- Pas Administrator
+
+Réglages recommandés :
+
+- anti-spam léger ;
+- anti-mentions massives ;
+- anti-invites Discord externes ;
+- anti-liens suspects optionnel ;
+- pas de ban automatique agressif ;
+- pas de filtre insultes trop strict au début ;
+- logs automod dans `🧾・logs`.
+
+Checklist de test :
+
+- Un spam test est supprimé ou loggé.
+- Une invitation Discord externe est bloquée si activée.
+- Les logs arrivent dans `🧾・logs`.
+- Dyno ne peut pas écrire partout.
+- Dyno n’a pas Administrator.
+- Dyno ne gère pas les rôles de validation.
+
+## 3. Ticket Tool
 
 Objectif :
 
@@ -152,7 +218,7 @@ Checklist de test :
 - Les logs apparaissent dans `🧾・logs`.
 - Le panel reste lisible dans `🎫・tickets`.
 
-## 3. VoiceMaster ou TempVoice
+## 4. VoiceMaster ou TempVoice
 
 Objectif :
 
@@ -192,7 +258,7 @@ Checklist de test :
 - Le bot ne modifie pas les vocaux permanents.
 - Les permissions vocales restent propres pour `✅・Membre`.
 
-## 4. Sesh ou Apollo
+## 5. Sesh ou Apollo
 
 Objectif :
 
@@ -234,44 +300,6 @@ Checklist de test :
 - Les rappels fonctionnent.
 - Les rôles `🎮・Game Night` ou `🎬・Watch Party` sont mentionnés correctement.
 - Le bot ne mentionne pas `@everyone` inutilement.
-
-## 5. Statbot
-
-Objectif :
-
-- Statistiques d’activité.
-
-Rôles à attribuer :
-
-- `🤖・Bot`
-- `📊・Bot Stats`
-
-Salons :
-
-- Stats : `📊・stats`
-- Logs : `🧾・logs`
-
-Permissions minimales :
-
-- View Channels
-- Send Messages
-- Embed Links
-- Read Message History
-- View Server Insights si nécessaire
-
-Configuration :
-
-1. Configure `📊・stats` comme salon d’affichage.
-2. Configure les logs techniques dans `🧾・logs` si disponible.
-3. Limite les statistiques visibles aux données utiles.
-4. Évite d’exposer des stats sensibles si inutile.
-
-Checklist de test :
-
-- Les stats apparaissent dans `📊・stats`.
-- Les stats ne révèlent pas d’informations sensibles.
-- Le bot n’écrit pas dans les salons publics non prévus.
-- Les logs restent dans `🧾・logs`.
 
 ## 6. PatchBot
 
@@ -395,7 +423,47 @@ Checklist de test :
 - Les tickets ne peuvent pas apparaître.
 - Le bot met à jour le post si le nombre d’étoiles change.
 
-## 9. EasyPoll ou Pollmaster
+## 9. Statbot
+
+À installer après quelques jours, quand l’activité du serveur commence à produire des données utiles.
+
+Objectif :
+
+- Statistiques d’activité.
+
+Rôles à attribuer :
+
+- `🤖・Bot`
+- `📊・Bot Stats`
+
+Salons :
+
+- Stats : `📊・stats`
+- Logs : `🧾・logs`
+
+Permissions minimales :
+
+- View Channels
+- Send Messages
+- Embed Links
+- Read Message History
+- View Server Insights si nécessaire
+
+Configuration :
+
+1. Configure `📊・stats` comme salon d’affichage.
+2. Configure les logs techniques dans `🧾・logs` si disponible.
+3. Limite les statistiques visibles aux données utiles.
+4. Évite d’exposer des stats sensibles si inutile.
+
+Checklist de test :
+
+- Les stats apparaissent dans `📊・stats`.
+- Les stats ne révèlent pas d’informations sensibles.
+- Le bot n’écrit pas dans les salons publics non prévus.
+- Les logs restent dans `🧾・logs`.
+
+## 10. EasyPoll ou Pollmaster
 
 Objectif :
 
@@ -435,7 +503,7 @@ Checklist de test :
 - Le résultat est visible.
 - La mention `📊・Sondages` n’est pas abusive.
 
-## 10. Jockie Music ou Kenku FM
+## 11. Jockie Music ou Kenku FM
 
 Objectif :
 
@@ -482,6 +550,8 @@ Checklist de test :
 - `Administrator` est donné par facilité alors que des permissions ciblées suffisent.
 - Le bot peut écrire dans trop de salons.
 - Les logs sont envoyés dans un salon public.
+- Carl-bot gère l’automod alors que Dyno doit le faire.
+- Dyno gère les rôles de validation alors que Carl-bot doit le faire.
 - Les tickets sont visibles par tout le monde.
 - Le Starboard inclut des salons staff.
 - Les rôles notifications sont mentionnés trop souvent.
@@ -493,7 +563,7 @@ Après avoir configuré tous les bots :
 
 1. Crée un compte ou rôle de test non validé.
 2. Vérifie qu’il ne voit que `👋・bienvenue`, `📜・règlement`, `🧭・guide`.
-3. Valide-le via Carl-bot ou Sapphire.
+3. Valide-le via Carl-bot.
 4. Vérifie qu’il reçoit `✅・Membre` et perd `🕯️・À valider`.
 5. Vérifie l’accès à `🎭・rôles`, LOUNGE, GAMING, CULTURE, ACTIVITÉ, BOTS et VOCAUX.
 6. Ouvre un ticket test.

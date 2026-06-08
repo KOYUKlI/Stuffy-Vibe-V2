@@ -30,17 +30,29 @@ Puis :
 /audit
 ```
 
-Les embeds permanents de règlement, validation, rôles ou plan des bots sont à créer manuellement avec Carl-bot ou Sapphire. Le bot custom ne publie plus de messages permanents.
+Les embeds permanents de règlement, validation, rôles ou plan des bots sont à créer manuellement avec Carl-bot. Le bot custom ne publie plus de messages permanents.
 
-## Après `/setup`
+## Après `/setup` et `/audit`
 
-Configure manuellement :
+Ordre manuel recommandé :
 
-- Sapphire ou Carl-bot dans `📜・règlement` et `🎭・rôles`.
-- Ticket Tool dans `🎫・tickets`.
-- VoiceMaster ou TempVoice sur `➕・créer-un-vocal`.
-- Sesh/Apollo dans `📅・events`.
-- Statbot, PatchBot, FreeStuff et Starboard dans leurs salons dédiés.
+1. Upload les emojis custom depuis `docs/EMOJI_BUNDLE.md`.
+2. Configure Carl-bot :
+   - rôle `🤖・Bot` + `🛠️・Bot Modération` ;
+   - autorole `🕯️・À valider` ;
+   - greetings dans `👋・bienvenue` ;
+   - validation dans `📜・règlement` ;
+   - reaction roles dans `🎭・rôles`.
+3. Configure Dyno :
+   - rôle `🤖・Bot` + `🛡️・Bot Automod` ;
+   - automod léger ;
+   - logs automod dans `🧾・logs`.
+4. Teste le parcours membre complet.
+5. Installe Ticket Tool.
+6. Installe VoiceMaster.
+7. Installe Sesh.
+8. Installe PatchBot et FreeStuff.
+9. Ajoute Statbot, EasyPoll et musique plus tard seulement si nécessaire.
 
 Le bot custom reste un outil d’infrastructure.
 Une fois `/setup` terminé, tu peux l’arrêter.

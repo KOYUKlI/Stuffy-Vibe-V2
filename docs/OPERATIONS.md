@@ -14,6 +14,17 @@ Lance le bot seulement pour :
 
 Tu peux arrêter le bot après l’opération. Discord conserve les rôles, salons et permissions.
 
+## Bots quotidiens
+
+Le bot custom ne gère pas l’automod, les greetings, la validation, les reaction roles, les tickets, les events, les stats ou la musique.
+
+Ces éléments sont configurés manuellement :
+
+- Carl-bot : autorole, greetings, validation règlement, reaction roles.
+- Dyno : automod spécialisé, anti-spam, anti-mentions massives, anti-invitations externes, logs automod.
+
+Le bot custom peut être arrêté après provisioning. Carl-bot et Dyno restent les bots opérationnels pour leurs périmètres respectifs.
+
 ## Quand utiliser `/setup`
 
 Utilise `/setup` :
@@ -103,6 +114,6 @@ Le bot ne restaure pas automatiquement un backup. Pour revenir en arrière :
 - Valider les membres.
 - Gérer des boutons ou menus de rôles.
 - Publier des messages permanents.
-- Gérer tickets, logs quotidiens, events, stats, musique ou vocaux temporaires.
+- Gérer automod, tickets, logs quotidiens, events, stats, musique ou vocaux temporaires.
 
 Ces fonctions appartiennent aux bots externes documentés dans `docs/EXTERNAL_BOTS_SETUP.md`.

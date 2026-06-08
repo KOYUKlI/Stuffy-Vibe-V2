@@ -40,7 +40,8 @@ Il peut écrire dans les salons membres, réagir, envoyer images/liens et rejoin
 
 Chaque bot externe reçoit `🤖・Bot` plus un rôle spécialisé :
 
-- `🛠️・Bot Modération` : `📜・règlement`, `🎭・rôles`, `🧾・logs`, `⚙️・bot-config`. Peut envoyer messages, embeds, réactions, gérer les messages et gérer les rôles si nécessaire.
+- `🛠️・Bot Modération` : réservé à Carl-bot pour autorole, greetings, validation et reaction roles. Accès à `👋・bienvenue`, `📜・règlement`, `🎭・rôles`, `🧾・logs`, `⚙️・bot-config`. Peut envoyer messages, embeds, réactions et gérer les rôles nécessaires.
+- `🛡️・Bot Automod` : réservé à Dyno pour automod. Accès à `🧾・logs`, `⚙️・bot-config` et lecture des salons membres si nécessaire. Peut utiliser View Channel, Send Messages, Embed Links, Read Message History, Manage Messages et Moderate Members si timeout utilisé. Pas de Manage Roles sauf besoin exceptionnel, pas d’Administrator, pas d’accès inutile à STAFF privé hors logs/config.
 - `🎫・Bot Tickets` : `🎫・tickets`, `🚨・signalements`, `🧾・logs`. Peut gérer les salons nécessaires aux tickets.
 - `🔊・Bot Vocal` : `➕・créer-un-vocal` et catégorie `🔊・VOCAUX`. Peut gérer les vocaux temporaires.
 - `📅・Bot Events` : `📅・events`, `📌・annonces-potes`. Peut envoyer messages et embeds.
@@ -50,6 +51,8 @@ Chaque bot externe reçoit `🤖・Bot` plus un rôle spécialisé :
 - `🎵・Bot Music` : `🎵・musique-bot` et `🎧・music`. Peut se connecter et parler.
 
 Les rôles bots spécialisés restent sous `神 (Fondateur)`, `🛡️・Admin` et `🔧・Modérateur`.
+
+Ne mélange pas les responsabilités : Carl-bot garde `🛠️・Bot Modération` pour validation/rôles, Dyno utilise `🛡️・Bot Automod` pour l’automod. Dyno ne gère pas la validation et Carl-bot ne gère pas l’automod.
 
 ## Muted
 
