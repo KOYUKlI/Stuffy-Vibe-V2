@@ -54,4 +54,7 @@ export interface ManualChannelOptions {
 export interface SyncOptions {
   dryRun: boolean;
   force: boolean;
+  backup?: boolean;
 }
+
+export type ClearScope = 'managed' | 'all-channels' | 'all-project';

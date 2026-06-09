@@ -20,7 +20,10 @@ export class SyncService {
       `${options.dryRun ? '[dry-run] ' : ''}Synchronisation structure pour ${guild.name} (${guild.id})`,
     );
 
-    const backupPath = await this.backupBeforeMutation(guild, options.dryRun, 'backup-before-sync');
+    const backupPath =
+      options.backup === false
+        ? undefined
+        : await this.backupBeforeMutation(guild, options.dryRun, 'backup-before-sync');
 
     if (guild.name !== BRANDING.guildName) {
       if (options.dryRun) {

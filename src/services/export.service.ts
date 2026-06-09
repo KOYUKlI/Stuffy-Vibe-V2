@@ -1,6 +1,6 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
-import type { Guild, GuildBasedChannel } from 'discord.js';
+import type { Guild, NonThreadGuildBasedChannel } from 'discord.js';
 import { channelTypeLabel } from '../utils/format.js';
 
 interface ExportResult {
@@ -11,6 +11,11 @@ interface ExportResult {
 
 export class ExportService {
   public async exportGuild(guild: Guild, prefix = 'server-config'): Promise<ExportResult> {
+    const fetchedChannels = await guild.channels.fetch();
+    const channels = [...fetchedChannels.values()].filter(
+      (channel): channel is NonThreadGuildBasedChannel => Boolean(channel),
+    );
+
     const payload = {
       exportedAt: new Date().toISOString(),
       guild: {
@@ -30,7 +35,7 @@ export class ExportService {
           position: role.position,
           permissions: role.permissions.toArray(),
         })),
-      channels: guild.channels.cache
+      channels: channels
         .sort((a, b) => this.channelPosition(a) - this.channelPosition(b))
         .map((channel) => this.serializeChannel(channel)),
     };
@@ -49,7 +54,7 @@ export class ExportService {
     };
   }
 
-  private serializeChannel(channel: GuildBasedChannel) {
+  private serializeChannel(channel: NonThreadGuildBasedChannel) {
     return {
       id: channel.id,
       name: channel.name,
@@ -68,7 +73,7 @@ export class ExportService {
     };
   }
 
-  private channelPosition(channel: GuildBasedChannel): number {
+  private channelPosition(channel: NonThreadGuildBasedChannel): number {
     return 'rawPosition' in channel ? channel.rawPosition : 0;
   }
 }

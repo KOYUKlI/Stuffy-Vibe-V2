@@ -92,8 +92,20 @@ Lance le bot uniquement quand tu dois provisionner ou maintenir la structure. Un
 - `/create-role` : crée un rôle sans permission `Administrator`.
 - `/delete-role role confirm` : supprime seulement si `confirm` vaut `CONFIRM`.
 - `/export-config` : exporte la structure actuelle dans `exports/server-config-*.json`.
+- `/clear-server scope dry-run confirm` : supprime selon le scope `managed`, `all-channels` ou `all-project`, avec `dry-run:true` par défaut.
+- `/rebuild-server dry-run confirm force-permissions clear-project-roles` : backup, clear de tous les salons, rebuild depuis les fichiers de config, puis synthèse/audit.
 
-Avant `/setup`, `/sync` et `/sync-permissions` en mode réel, le bot crée automatiquement un backup dans `exports/`. Aucun backup n’est créé en `dry-run`.
+Avant `/setup`, `/sync`, `/sync-permissions`, `/clear-server` et `/rebuild-server` en mode réel, le bot crée automatiquement un backup dans `exports/`. Aucun backup n’est créé en `dry-run`.
+
+Confirmations destructives :
+
+- `/clear-server scope:managed dry-run:false confirm:DELETE_SERVER_STRUCTURE`
+- `/clear-server scope:all-channels dry-run:false confirm:DELETE_ALL_CHANNELS`
+- `/rebuild-server dry-run:false confirm:REBUILD_SERVER`
+
+Pour un reset complet des salons avant reconstruction, utilise `/rebuild-server dry-run:false confirm:REBUILD_SERVER`. La commande supprime tous les salons détectés via l’API Discord, pas seulement ceux listés dans `channels.config.ts`, puis reconstruit depuis la configuration.
+
+En mode réel, `/clear-server` et `/rebuild-server` envoient le rapport final en DM, car le salon où la commande a été lancée peut être supprimé pendant l’opération.
 
 ## Forums
 

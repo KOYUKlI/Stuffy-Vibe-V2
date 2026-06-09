@@ -17,10 +17,16 @@ export function channelTypeLabel(type: ChannelType): string {
       return 'texte';
     case ChannelType.GuildVoice:
       return 'vocal';
+    case ChannelType.GuildAnnouncement:
+      return 'annonce';
     case ChannelType.GuildForum:
       return 'forum';
     case ChannelType.GuildCategory:
       return 'catégorie';
+    case ChannelType.GuildStageVoice:
+      return 'stage';
+    case ChannelType.GuildMedia:
+      return 'média';
     default:
       return `type-${type}`;
   }
