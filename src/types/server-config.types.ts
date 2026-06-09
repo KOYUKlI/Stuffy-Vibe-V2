@@ -1,6 +1,6 @@
 import type { ChannelType, ColorResolvable } from 'discord.js';
 
-export type RoleKind = 'hierarchy' | 'interest' | 'notification' | 'color';
+export type RoleKind = 'hierarchy' | 'universe' | 'game' | 'notification' | 'color' | 'bot';
 
 export interface RoleConfig {
   name: string;
@@ -25,12 +25,16 @@ export type PermissionProfile =
   | 'bot-publication'
   | 'bot-staff';
 
+export type StaffAccess = 'all' | 'founder-only';
+
 export interface ChannelConfig {
   name: string;
   type: ProvisionedChannelType;
   fallbackType?: ChannelType.GuildText;
   profile: PermissionProfile;
   botRoles?: string[];
+  accessRoles?: string[];
+  staffAccess?: StaffAccess;
   topic?: string;
   reason?: string;
 }
@@ -39,6 +43,8 @@ export interface CategoryConfig {
   name: string;
   profile: 'entry' | 'member' | 'staff' | 'bots';
   botRoles?: string[];
+  accessRoles?: string[];
+  staffAccess?: StaffAccess;
   channels: ChannelConfig[];
 }
 

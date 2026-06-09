@@ -54,7 +54,14 @@ export class AuditService {
     const everyone = guild.roles.everyone;
     const pending = findRole(guild, ROLE_NAMES.pending);
     const member = findRole(guild, ROLE_NAMES.member);
-    const staffOnlyNames: string[] = [CHANNEL_NAMES.logs, CHANNEL_NAMES.tickets, '🛠️・admin'];
+    const staffOnlyNames: string[] = [
+      CHANNEL_NAMES.logs,
+      CHANNEL_NAMES.botConfig,
+      CHANNEL_NAMES.tickets,
+      CHANNEL_NAMES.reports,
+      '🛡️・staff-chat',
+      '📦・archives-staff',
+    ];
     const entryNames: string[] = [CHANNEL_NAMES.welcome, CHANNEL_NAMES.rules, CHANNEL_NAMES.guide];
 
     for (const channel of guild.channels.cache.values()) {

@@ -70,6 +70,7 @@ export class RoleService {
       ROLE_NAMES.admin,
       ROLE_NAMES.moderator,
       ROLE_NAMES.botModeration,
+      ROLE_NAMES.botAutomod,
       ROLE_NAMES.botTickets,
       ROLE_NAMES.botVoice,
       ROLE_NAMES.botEvents,
@@ -77,12 +78,12 @@ export class RoleService {
       ROLE_NAMES.botNews,
       ROLE_NAMES.botStarboard,
       ROLE_NAMES.botMusic,
+      ROLE_NAMES.privateCircle,
       ROLE_NAMES.elder,
       ROLE_NAMES.member,
-      ROLE_NAMES.pending,
-      ROLE_NAMES.guest,
-      ROLE_NAMES.bot,
       ROLE_NAMES.muted,
+      ROLE_NAMES.pending,
+      ROLE_NAMES.bot,
     ];
 
     let position = Math.max(botHighest - 1, 1);

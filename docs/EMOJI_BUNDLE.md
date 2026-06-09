@@ -79,7 +79,7 @@ Tu peux utiliser ces emojis dans :
 - boutons ou réactions de validation ;
 - panels de notifications.
 
-Carl-bot ou Sapphire gèrent l’usage des emojis dans leurs panels. Le provisioning bot custom ne le fait pas.
+Carl-bot gère l’usage des emojis dans ses panels de validation et de rôles. Le provisioning bot custom ne le fait pas.
 
 ## À éviter
 

@@ -12,6 +12,8 @@
 
 Active **Community** avant `/setup` si tu veux les salons forum pour `🎞️・clips`, `💡・suggestions` et `🎨・créatif`.
 
+Relance aussi `npm run deploy-commands` après chaque mise à jour des commandes slash, par exemple si `/clear-server` ou `/rebuild-server` reçoit de nouvelles options.
+
 ## Lancer
 
 ```bash

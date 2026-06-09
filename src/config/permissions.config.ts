@@ -1,5 +1,17 @@
 import { PermissionFlagsBits } from 'discord.js';
 
+export const EVERYONE_DENY = [
+  PermissionFlagsBits.ViewChannel,
+  PermissionFlagsBits.SendMessages,
+  PermissionFlagsBits.CreatePublicThreads,
+  PermissionFlagsBits.CreatePrivateThreads,
+  PermissionFlagsBits.SendMessagesInThreads,
+  PermissionFlagsBits.AddReactions,
+  PermissionFlagsBits.CreateInstantInvite,
+  PermissionFlagsBits.MentionEveryone,
+  PermissionFlagsBits.Speak,
+];
+
 export const READ_ONLY_DENY = [
   PermissionFlagsBits.SendMessages,
   PermissionFlagsBits.CreatePublicThreads,
@@ -33,6 +45,8 @@ export const MUTED_DENY = [
   PermissionFlagsBits.CreatePrivateThreads,
   PermissionFlagsBits.SendMessagesInThreads,
   PermissionFlagsBits.AddReactions,
+  PermissionFlagsBits.CreateInstantInvite,
+  PermissionFlagsBits.MentionEveryone,
   PermissionFlagsBits.Speak,
 ];
 
@@ -81,6 +95,12 @@ export const BOT_MODERATION_ALLOW = [
   ...BOT_TEXT_ALLOW,
   PermissionFlagsBits.AddReactions,
   PermissionFlagsBits.ManageMessages,
+];
+
+export const BOT_AUTOMOD_ALLOW = [
+  ...BOT_TEXT_ALLOW,
+  PermissionFlagsBits.ManageMessages,
+  PermissionFlagsBits.ModerateMembers,
 ];
 
 export const BOT_TICKETS_ALLOW = [

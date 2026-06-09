@@ -27,17 +27,25 @@ Après validation, Carl-bot donne le rôle `✅・Membre` et retire `🕯️・�
 Avec `✅・Membre`, le membre débloque :
 
 - `🎭・rôles`
-- LOUNGE
-- GAMING
-- CULTURE
-- ACTIVITÉ
-- BOTS
-- VOCAUX
+- `◆・HUB`
+- `➕・créer-un-vocal`
+- `🔊・vocal-général`
 
-Il peut choisir ses rôles avec Carl-bot, participer dans `💬・général`, chercher des joueurs dans `🔎・lfg`, rejoindre les events, poster clips et suggestions, et rejoindre les vocaux.
+Il peut choisir ses rôles avec Carl-bot, participer dans `💬・général`, poster dans `📸・partage`, utiliser `🎫・support`, voter dans `📊・sondages` et rejoindre le vocal général.
+
+Les univers restent cachés tant qu’il n’a pas choisi le rôle correspondant :
+
+- `🎮・Gaming` pour `◇・GAMING` ;
+- `🎌・Anime & Manga` pour `𖤐・ANIME & MANGA` ;
+- `🍿・Films & Séries` pour `✧・FILMS & SÉRIES` ;
+- `🎵・Musique` pour `♬・MUSIQUE` ;
+- `🎨・Créatif` pour `✎・CRÉATIF` ;
+- `💻・Tech` pour `⌘・TECH`.
+
+Les salons de jeux spécifiques demandent aussi leur rôle exact. Par exemple, `🎯・valorant` demande `🎯・Valorant`, même si le membre possède déjà `🎮・Gaming`.
 
 Dyno protège les salons membres après validation avec un automod léger. Les membres ne le voient pas comme une étape du parcours : il agit en arrière-plan contre spam, mentions massives, invitations externes et liens suspects si activés.
 
 ## Staff
 
-Les tickets, signalements, logs automod, events, stats et vocaux temporaires sont gérés par les bots externes documentés dans `docs/BOTS.md`.
+Les tickets, signalements, logs automod, events, stats et vocaux temporaires sont gérés par les bots externes documentés dans `docs/EXTERNAL_BOTS_SETUP.md`.

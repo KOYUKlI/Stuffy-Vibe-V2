@@ -14,7 +14,7 @@ Ce bot est volontairement limité : il crée, synchronise, audite, exporte et aj
 - Pas de `MessageContent`.
 - Pas de `GuildMembers`.
 
-Ces usages sont documentés dans [docs/BOTS.md](docs/BOTS.md) et doivent être confiés à des bots externes.
+Ces usages sont documentés dans [docs/EXTERNAL_BOTS_SETUP.md](docs/EXTERNAL_BOTS_SETUP.md) et doivent être confiés à des bots externes.
 
 ## Création de l’application Discord
 
@@ -71,7 +71,7 @@ npm install
 npm run deploy-commands
 ```
 
-Les commandes sont déployées sur le serveur indiqué par `GUILD_ID`.
+Les commandes sont déployées sur le serveur indiqué par `GUILD_ID`. Relance cette commande après chaque ajout ou modification d’options slash, par exemple après une évolution de `/clear-server` ou `/rebuild-server`.
 
 ## Lancer en développement
 
@@ -113,7 +113,7 @@ Le bot tente de créer des salons forum pour `🎞️・clips`, `💡・suggesti
 
 ## Parcours membre
 
-Le nouveau membre voit seulement `👋・bienvenue`, `📜・règlement` et `🧭・guide`. La validation est prévue directement dans `📜・règlement`, via Sapphire ou Carl-bot. Une fois le rôle `✅・Membre` reçu, il débloque le serveur principal et peut accéder à `🎭・rôles`.
+Le nouveau membre voit seulement `👋・bienvenue`, `📜・règlement` et `🧭・guide`. La validation est prévue directement dans `📜・règlement`, via Carl-bot. Une fois le rôle `✅・Membre` reçu, il débloque le serveur principal et peut accéder à `🎭・rôles`.
 
 Voir [docs/USER_JOURNEY.md](docs/USER_JOURNEY.md).
 
@@ -121,7 +121,8 @@ Voir [docs/USER_JOURNEY.md](docs/USER_JOURNEY.md).
 
 Configure manuellement les bots externes après le provisioning :
 
-- Sapphire ou Carl-bot pour validation, rôles, embeds permanents et logs simples.
+- Carl-bot pour autorole, greetings, validation règlement, reaction roles et embeds permanents liés à l’entrée.
+- Dyno pour automod léger, anti-spam, anti-mentions massives, anti-invitations externes et logs automod.
 - Ticket Tool pour tickets et signalements.
 - VoiceMaster ou TempVoice pour vocaux temporaires.
 - Sesh ou Apollo pour events.
@@ -133,8 +134,7 @@ Configure manuellement les bots externes après le provisioning :
 - Jockie Music ou Kenku FM pour musique.
 - Beemo, Double Counter ou Wick pour sécurité si besoin.
 
-Voir [docs/BOTS.md](docs/BOTS.md).
-Voir aussi [docs/CARL_BOT_SETUP.md](docs/CARL_BOT_SETUP.md) pour la configuration manuelle de Carl-bot.
+Voir [docs/EXTERNAL_BOTS_SETUP.md](docs/EXTERNAL_BOTS_SETUP.md) pour la configuration manuelle de Carl-bot, Dyno et des autres bots externes.
 
 ## Opérations
 

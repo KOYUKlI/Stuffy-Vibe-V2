@@ -1,7 +1,11 @@
 import { ChannelType } from 'discord.js';
 import type { CategoryChannel, Guild, GuildBasedChannel, Role } from 'discord.js';
-import { SERVER_CATEGORIES } from '../config/channels.config.js';
-import type { ChannelConfig, ManualChannelOptions } from '../types/server-config.types.js';
+import { REMOVED_CATEGORY_NAMES, SERVER_CATEGORIES } from '../config/channels.config.js';
+import type {
+  CategoryConfig,
+  ChannelConfig,
+  ManualChannelOptions,
+} from '../types/server-config.types.js';
 import { findCategory, findChannelInCategory } from '../utils/finders.js';
 import { logger } from '../utils/logger.js';
 import { PermissionService } from './permission.service.js';
@@ -14,6 +18,8 @@ export class ChannelService {
     roles: Map<string, Role>,
     dryRun = false,
   ): Promise<void> {
+    await this.removeConfiguredLegacyCategories(guild, dryRun);
+
     for (const categoryConfig of SERVER_CATEGORIES) {
       let category = findCategory(guild, categoryConfig.name);
       const categoryOverwrites = this.permissionService.categoryOverwrites(categoryConfig, {
@@ -48,7 +54,7 @@ export class ChannelService {
         await this.ensureChannel(
           guild,
           category,
-          this.withInheritedBotRoles(channelConfig, categoryConfig.botRoles),
+          this.withInheritedCategoryConfig(channelConfig, categoryConfig),
           roles,
           dryRun,
         );
@@ -78,10 +84,7 @@ export class ChannelService {
       }
 
       for (const channelConfig of categoryConfig.channels) {
-        const channelWithBotRoles = this.withInheritedBotRoles(
-          channelConfig,
-          categoryConfig.botRoles,
-        );
+        const channelWithBotRoles = this.withInheritedCategoryConfig(channelConfig, categoryConfig);
         const channel = this.findExpectedChannel(guild, category.id, channelWithBotRoles);
         if (!channel || !('permissionOverwrites' in channel)) {
           logger.warn(`Salon absent, permissions ignorées: ${channelConfig.name}`);
@@ -170,14 +173,58 @@ export class ChannelService {
     );
   }
 
-  private withInheritedBotRoles(
+  private withInheritedCategoryConfig(
     channelConfig: ChannelConfig,
-    categoryBotRoles: string[] = [],
+    categoryConfig: CategoryConfig,
   ): ChannelConfig {
     return {
       ...channelConfig,
-      botRoles: [...new Set([...categoryBotRoles, ...(channelConfig.botRoles ?? [])])],
+      accessRoles: channelConfig.accessRoles ?? categoryConfig.accessRoles,
+      staffAccess: channelConfig.staffAccess ?? categoryConfig.staffAccess,
+      botRoles: [
+        ...new Set([...(categoryConfig.botRoles ?? []), ...(channelConfig.botRoles ?? [])]),
+      ],
     };
+  }
+
+  private async removeConfiguredLegacyCategories(guild: Guild, dryRun: boolean): Promise<void> {
+    for (const categoryName of REMOVED_CATEGORY_NAMES) {
+      const category = findCategory(guild, categoryName);
+      if (!category) continue;
+
+      const children = guild.channels.cache
+        .filter((channel) => channel.parentId === category.id)
+        .map((channel) => channel);
+
+      if (dryRun) {
+        logger.info(
+          `[dry-run] Supprimerait l’ancienne catégorie ${categoryName} et ${children.length} salon(s) enfant(s).`,
+        );
+        continue;
+      }
+
+      for (const child of children) {
+        if (!this.canDelete(child)) {
+          logger.warn(`Ancien salon non supprimable ignoré: ${child.name}`);
+          continue;
+        }
+
+        await child.delete('Suppression ancienne catégorie ❖・JEUX');
+        logger.info(`Ancien salon supprimé: ${child.name}`);
+      }
+
+      if (!this.canDelete(category)) {
+        logger.warn(`Ancienne catégorie non supprimable ignorée: ${category.name}`);
+        continue;
+      }
+
+      await category.delete('Suppression ancienne catégorie remplacée par ◇・GAMING');
+      logger.info(`Ancienne catégorie supprimée: ${category.name}`);
+    }
+  }
+
+  private canDelete(channel: GuildBasedChannel): boolean {
+    return 'deletable' in channel ? channel.deletable : false;
   }
 
   private async createChannelWithFallback(

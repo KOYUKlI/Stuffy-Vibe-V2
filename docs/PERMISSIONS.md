@@ -8,31 +8,41 @@
 - `📜・règlement`
 - `🧭・guide`
 
-Ils ne peuvent pas écrire, créer de threads, réagir, créer des invitations ou mentionner everyone/here.
+Ils ne peuvent pas écrire, créer de threads, réagir, créer des invitations, parler en vocal ou mentionner everyone/here.
 
-## Membres
+`🚪・départs` et `🎭・rôles` sont visibles seulement après validation.
 
-`✅・Membre` voit :
+## Membre Validé
 
-- `🎭・rôles`
-- LOUNGE
-- GAMING
-- CULTURE
-- ACTIVITÉ
-- BOTS
-- VOCAUX
+`✅・Membre` débloque uniquement :
 
-Il peut écrire dans les salons membres, réagir, envoyer images/liens et rejoindre les vocaux.
+- `✦・ENTRÉE` complète ;
+- `◆・HUB` ;
+- `✹・VOCAUX` avec `➕・créer-un-vocal` et `🔊・vocal-général`.
 
-`⭐・Ancien` suit les mêmes permissions que `✅・Membre`, avec la possibilité de futurs salons privés.
+Un membre validé ne voit pas automatiquement les univers spécialisés. Il doit recevoir ou choisir le rôle adapté.
+
+## Déblocage Par Rôle
+
+- `🎮・Gaming` : accès aux salons généraux de `◇・GAMING`.
+- Rôles jeux : chaque salon jeu spécifique demande son rôle exact, par exemple `🎯・valorant` demande `🎯・Valorant`.
+- `🎌・Anime & Manga` : accès à `𖤐・ANIME & MANGA`.
+- `🍿・Films & Séries` : accès à `✧・FILMS & SÉRIES`.
+- `🎵・Musique` : accès à `♬・MUSIQUE` et au vocal `🎧・music`.
+- `🎨・Créatif` : accès à `✎・CRÉATIF`.
+- `💻・Tech` : accès à `⌘・TECH`.
+- `⭐・Ancien` : accès à `☾・ANCIENS`.
+- `💎・Cercle privé` : accès à `✦・CERCLE PRIVÉ` et aussi à `☾・ANCIENS`.
 
 ## Staff
 
-`🔧・Modérateur` voit STAFF, peut gérer les messages et timeout.
+`🔧・Modérateur` voit `▣・STAFF`, peut gérer les messages et timeout selon ses permissions.
 
-`🛡️・Admin` peut gérer salons et rôles, sans `Administrator` automatique.
+`🛡️・Admin` peut gérer salons et rôles sous son niveau, sans `Administrator` automatique.
 
-`神 (Fondateur)` reçoit des overwrites complets sans permission `Administrator` automatique dans le code.
+`神 (Fondateur)` reçoit les overwrites complets sans permission `Administrator` automatique dans le code.
+
+`✦・CERCLE PRIVÉ` est limité à `💎・Cercle privé` et `神 (Fondateur)` ; les modérateurs n’y ont pas un accès automatique.
 
 ## Bots
 
@@ -40,20 +50,29 @@ Il peut écrire dans les salons membres, réagir, envoyer images/liens et rejoin
 
 Chaque bot externe reçoit `🤖・Bot` plus un rôle spécialisé :
 
-- `🛠️・Bot Modération` : réservé à Carl-bot pour autorole, greetings, validation et reaction roles. Accès à `👋・bienvenue`, `📜・règlement`, `🎭・rôles`, `🧾・logs`, `⚙️・bot-config`. Peut envoyer messages, embeds, réactions et gérer les rôles nécessaires.
-- `🛡️・Bot Automod` : réservé à Dyno pour automod. Accès à `🧾・logs`, `⚙️・bot-config` et lecture des salons membres si nécessaire. Peut utiliser View Channel, Send Messages, Embed Links, Read Message History, Manage Messages et Moderate Members si timeout utilisé. Pas de Manage Roles sauf besoin exceptionnel, pas d’Administrator, pas d’accès inutile à STAFF privé hors logs/config.
-- `🎫・Bot Tickets` : `🎫・tickets`, `🚨・signalements`, `🧾・logs`. Peut gérer les salons nécessaires aux tickets.
-- `🔊・Bot Vocal` : `➕・créer-un-vocal` et catégorie `🔊・VOCAUX`. Peut gérer les vocaux temporaires.
-- `📅・Bot Events` : `📅・events`, `📌・annonces-potes`. Peut envoyer messages et embeds.
-- `📊・Bot Stats` : `📊・stats`, `🧾・logs`. Peut envoyer messages et embeds.
-- `📰・Bot News` : `📰・patch-notes`, `🎁・free-games`. Peut envoyer messages et embeds.
-- `⭐・Bot Starboard` : lecture des salons membres nécessaires et écriture dans `⭐・best-of`.
-- `🎵・Bot Music` : `🎵・musique-bot` et `🎧・music`. Peut se connecter et parler.
+- `🛠️・Bot Modération` : Carl-bot pour autorole, greetings, validation et reaction roles.
+- `🛡️・Bot Automod` : Dyno pour automod, logs automod et modération légère.
+- `🎫・Bot Tickets` : Ticket Tool pour `🎫・support`, `🎫・tickets-logs` et `🚨・signalements`.
+- `🔊・Bot Vocal` : VoiceMaster/TempVoice pour `➕・créer-un-vocal` et les vocaux temporaires.
+- `📅・Bot Events` : Sesh/Apollo pour annonces et watch parties.
+- `📊・Bot Stats` : Statbot si ajouté plus tard.
+- `📰・Bot News` : PatchBot/FreeStuff pour `📰・patch-notes` et `🎁・free-games`.
+- `⭐・Bot Starboard` : lecture des salons membres nécessaires si Starboard est installé.
+- `🎵・Bot Music` : `🎵・musique-bot` et `🎧・music`.
 
 Les rôles bots spécialisés restent sous `神 (Fondateur)`, `🛡️・Admin` et `🔧・Modérateur`.
 
-Ne mélange pas les responsabilités : Carl-bot garde `🛠️・Bot Modération` pour validation/rôles, Dyno utilise `🛡️・Bot Automod` pour l’automod. Dyno ne gère pas la validation et Carl-bot ne gère pas l’automod.
-
 ## Muted
 
-`🔇・Muted` peut voir certains salons membres mais ne peut pas écrire, parler en vocal, créer de threads ou réagir.
+`🔇・Muted` bloque :
+
+- Send Messages ;
+- Create Public Threads ;
+- Create Private Threads ;
+- Send Messages In Threads ;
+- Add Reactions ;
+- Create Invite ;
+- Mention Everyone ;
+- Speak.
+
+Ces dénis restent appliqués même si le membre possède un rôle d’univers ou de jeu.

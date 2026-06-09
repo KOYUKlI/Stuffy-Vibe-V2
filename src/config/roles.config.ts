@@ -1,17 +1,56 @@
 import { PermissionFlagsBits } from 'discord.js';
-import type { RoleConfig } from '../types/server-config.types.js';
+import type { ColorResolvable } from 'discord.js';
+import type { RoleConfig, RoleKind } from '../types/server-config.types.js';
 import { BRANDING } from './branding.config.js';
 
 export const ROLE_NAMES = {
   founder: '神 (Fondateur)',
   admin: '🛡️・Admin',
   moderator: '🔧・Modérateur',
+  privateCircle: '💎・Cercle privé',
   elder: '⭐・Ancien',
   member: '✅・Membre',
+  muted: '🔇・Muted',
   pending: '🕯️・À valider',
   guest: '👁️・Invité',
+
+  gaming: '🎮・Gaming',
+  animeManga: '🎌・Anime & Manga',
+  filmsSeries: '🍿・Films & Séries',
+  music: '🎵・Musique',
+  creative: '🎨・Créatif',
+  tech: '💻・Tech',
+
+  valorant: '🎯・Valorant',
+  minecraft: '⛏️・Minecraft',
+  gta: '🚗・GTA',
+  callOfDuty: '💀・Call of Duty',
+  leagueOfLegends: '🧙・League of Legends',
+  fortnite: '🏗️・Fortnite',
+  roblox: '🧱・Roblox',
+  rocketLeague: '🚀・Rocket League',
+  fpsMisc: '🔫・FPS divers',
+  gamesMisc: '🎲・Jeux divers',
+
+  announcements: '📢・Annonces',
+  gameNight: '🎮・Game Night',
+  watchParty: '🎬・Watch Party',
+  patchNotes: '📰・Patch Notes',
+  freeGames: '🎁・Free Games',
+  polls: '📊・Sondages',
+
+  colorGold: '🟨・Or',
+  colorNightPurple: '🟪・Violet nuit',
+  colorNeonBlue: '🟦・Bleu néon',
+  colorBloodRed: '🟥・Rouge sang',
+  colorJadeGreen: '🟩・Vert jade',
+  colorBlack: '⬛・Noir',
+  colorMoonWhite: '⬜・Blanc lune',
+  colorSakura: '🌸・Sakura',
+
   bot: '🤖・Bot',
   botModeration: '🛠️・Bot Modération',
+  botAutomod: '🛡️・Bot Automod',
   botTickets: '🎫・Bot Tickets',
   botVoice: '🔊・Bot Vocal',
   botEvents: '📅・Bot Events',
@@ -19,7 +58,6 @@ export const ROLE_NAMES = {
   botNews: '📰・Bot News',
   botStarboard: '⭐・Bot Starboard',
   botMusic: '🎵・Bot Music',
-  muted: '🔇・Muted',
 } as const;
 
 export const PROTECTED_ROLE_NAMES = [
@@ -29,353 +67,165 @@ export const PROTECTED_ROLE_NAMES = [
   ROLE_NAMES.member,
 ] as const;
 
-export const SERVER_ROLES: RoleConfig[] = [
-  {
-    name: ROLE_NAMES.founder,
-    color: BRANDING.colors.founderGold,
-    hoist: true,
+function role(
+  name: string,
+  color: ColorResolvable,
+  kind: RoleKind,
+  permissions: bigint[] = [],
+  options: Pick<RoleConfig, 'hoist' | 'mentionable' | 'protected'> = {
+    hoist: false,
     mentionable: false,
-    permissions: [],
-    kind: 'hierarchy',
-    protected: true,
   },
-  {
-    name: ROLE_NAMES.admin,
-    color: '#E74C3C',
+): RoleConfig {
+  return {
+    name,
+    color,
+    hoist: options.hoist ?? false,
+    mentionable: options.mentionable ?? false,
+    permissions,
+    kind,
+    protected: options.protected,
+  };
+}
+
+export const HIERARCHY_ROLES: RoleConfig[] = [
+  role(ROLE_NAMES.founder, BRANDING.colors.founderGold, 'hierarchy', [], {
     hoist: true,
     mentionable: false,
-    permissions: [
+    protected: true,
+  }),
+  role(
+    ROLE_NAMES.admin,
+    '#E74C3C',
+    'hierarchy',
+    [
       PermissionFlagsBits.ManageChannels,
       PermissionFlagsBits.ManageRoles,
       PermissionFlagsBits.ManageMessages,
       PermissionFlagsBits.ViewAuditLog,
     ],
-    kind: 'hierarchy',
-  },
-  {
-    name: ROLE_NAMES.moderator,
-    color: '#3498DB',
-    hoist: true,
-    mentionable: false,
-    permissions: [
+    { hoist: true, mentionable: false },
+  ),
+  role(
+    ROLE_NAMES.moderator,
+    '#3498DB',
+    'hierarchy',
+    [
       PermissionFlagsBits.ManageMessages,
       PermissionFlagsBits.ModerateMembers,
       PermissionFlagsBits.ViewAuditLog,
     ],
-    kind: 'hierarchy',
-  },
-  {
-    name: ROLE_NAMES.elder,
-    color: BRANDING.colors.lavender,
+    { hoist: true, mentionable: false },
+  ),
+  role(ROLE_NAMES.privateCircle, '#ECF0F1', 'hierarchy', [], {
     hoist: true,
     mentionable: false,
-    permissions: [],
-    kind: 'hierarchy',
-  },
-  {
-    name: ROLE_NAMES.member,
-    color: '#2ECC71',
-    hoist: false,
-    mentionable: false,
-    permissions: [],
-    kind: 'hierarchy',
-  },
-  {
-    name: ROLE_NAMES.pending,
-    color: BRANDING.colors.coldGrey,
-    hoist: false,
-    mentionable: false,
-    permissions: [],
-    kind: 'hierarchy',
-  },
-  {
-    name: ROLE_NAMES.guest,
-    color: '#7F8C8D',
-    hoist: false,
-    mentionable: false,
-    permissions: [],
-    kind: 'hierarchy',
-  },
-  {
-    name: ROLE_NAMES.bot,
-    color: '#5865F2',
+  }),
+  role(ROLE_NAMES.elder, BRANDING.colors.lavender, 'hierarchy', [], {
     hoist: true,
     mentionable: false,
-    permissions: [],
-    kind: 'hierarchy',
-  },
-  {
-    name: ROLE_NAMES.botModeration,
-    color: '#3498DB',
-    hoist: true,
-    mentionable: false,
-    permissions: [PermissionFlagsBits.ManageRoles, PermissionFlagsBits.ManageMessages],
-    kind: 'hierarchy',
-  },
-  {
-    name: ROLE_NAMES.botTickets,
-    color: '#9B59B6',
-    hoist: true,
-    mentionable: false,
-    permissions: [PermissionFlagsBits.ManageChannels, PermissionFlagsBits.ManageMessages],
-    kind: 'hierarchy',
-  },
-  {
-    name: ROLE_NAMES.botVoice,
-    color: '#1ABC9C',
-    hoist: true,
-    mentionable: false,
-    permissions: [PermissionFlagsBits.ManageChannels, PermissionFlagsBits.MoveMembers],
-    kind: 'hierarchy',
-  },
-  {
-    name: ROLE_NAMES.botEvents,
-    color: '#E67E22',
-    hoist: true,
-    mentionable: false,
-    permissions: [],
-    kind: 'hierarchy',
-  },
-  {
-    name: ROLE_NAMES.botStats,
-    color: '#95A5A6',
-    hoist: true,
-    mentionable: false,
-    permissions: [],
-    kind: 'hierarchy',
-  },
-  {
-    name: ROLE_NAMES.botNews,
-    color: '#F1C40F',
-    hoist: true,
-    mentionable: false,
-    permissions: [],
-    kind: 'hierarchy',
-  },
-  {
-    name: ROLE_NAMES.botStarboard,
-    color: '#F39C12',
-    hoist: true,
-    mentionable: false,
-    permissions: [],
-    kind: 'hierarchy',
-  },
-  {
-    name: ROLE_NAMES.botMusic,
-    color: '#2ECC71',
-    hoist: true,
-    mentionable: false,
-    permissions: [],
-    kind: 'hierarchy',
-  },
-  {
-    name: ROLE_NAMES.muted,
-    color: '#555555',
-    hoist: false,
-    mentionable: false,
-    permissions: [],
-    kind: 'hierarchy',
-  },
-  {
-    name: '🎯・Valorant',
-    color: BRANDING.colors.lavender,
-    hoist: false,
-    mentionable: false,
-    permissions: [],
-    kind: 'interest',
-  },
-  {
-    name: '⛏️・Minecraft',
-    color: BRANDING.colors.lavender,
-    hoist: false,
-    mentionable: false,
-    permissions: [],
-    kind: 'interest',
-  },
-  {
-    name: '🎮・Gaming',
-    color: BRANDING.colors.lavender,
-    hoist: false,
-    mentionable: false,
-    permissions: [],
-    kind: 'interest',
-  },
-  {
-    name: '🍜・Anime',
-    color: BRANDING.colors.lavender,
-    hoist: false,
-    mentionable: false,
-    permissions: [],
-    kind: 'interest',
-  },
-  {
-    name: '🎬・Films & Séries',
-    color: BRANDING.colors.lavender,
-    hoist: false,
-    mentionable: false,
-    permissions: [],
-    kind: 'interest',
-  },
-  {
-    name: '🎧・Musique',
-    color: BRANDING.colors.lavender,
-    hoist: false,
-    mentionable: false,
-    permissions: [],
-    kind: 'interest',
-  },
-  {
-    name: '🎨・Créatif',
-    color: BRANDING.colors.lavender,
-    hoist: false,
-    mentionable: false,
-    permissions: [],
-    kind: 'interest',
-  },
-  {
-    name: '📺・Stream',
-    color: BRANDING.colors.lavender,
-    hoist: false,
-    mentionable: false,
-    permissions: [],
-    kind: 'interest',
-  },
-  {
-    name: '💻・Dev',
-    color: BRANDING.colors.lavender,
-    hoist: false,
-    mentionable: false,
-    permissions: [],
-    kind: 'interest',
-  },
-  {
-    name: '📢・Annonces',
-    color: BRANDING.colors.founderGold,
-    hoist: false,
-    mentionable: false,
-    permissions: [],
-    kind: 'notification',
-  },
-  {
-    name: '🎮・Game Night',
-    color: BRANDING.colors.founderGold,
-    hoist: false,
-    mentionable: false,
-    permissions: [],
-    kind: 'notification',
-  },
-  {
-    name: '🎬・Watch Party',
-    color: BRANDING.colors.founderGold,
-    hoist: false,
-    mentionable: false,
-    permissions: [],
-    kind: 'notification',
-  },
-  {
-    name: '🎁・Free Games',
-    color: BRANDING.colors.founderGold,
-    hoist: false,
-    mentionable: false,
-    permissions: [],
-    kind: 'notification',
-  },
-  {
-    name: '📊・Sondages',
-    color: BRANDING.colors.founderGold,
-    hoist: false,
-    mentionable: false,
-    permissions: [],
-    kind: 'notification',
-  },
-  {
-    name: '📰・Patch Notes',
-    color: BRANDING.colors.founderGold,
-    hoist: false,
-    mentionable: false,
-    permissions: [],
-    kind: 'notification',
-  },
-  {
-    name: '🌑・Bleu Nuit',
-    color: BRANDING.colors.midnightBlue,
-    hoist: false,
-    mentionable: false,
-    permissions: [],
-    kind: 'color',
-  },
-  {
-    name: '💜・Lavande',
-    color: BRANDING.colors.lavender,
-    hoist: false,
-    mentionable: false,
-    permissions: [],
-    kind: 'color',
-  },
-  {
-    name: '🤍・Blanc',
-    color: '#FFFFFF',
-    hoist: false,
-    mentionable: false,
-    permissions: [],
-    kind: 'color',
-  },
-  {
-    name: '🖤・Noir',
-    color: '#111111',
-    hoist: false,
-    mentionable: false,
-    permissions: [],
-    kind: 'color',
-  },
-  {
-    name: '🌸・Rose',
-    color: '#FF8FB3',
-    hoist: false,
-    mentionable: false,
-    permissions: [],
-    kind: 'color',
-  },
-  {
-    name: '💎・Cyan',
-    color: '#00D1FF',
-    hoist: false,
-    mentionable: false,
-    permissions: [],
-    kind: 'color',
-  },
-  {
-    name: '🍃・Menthe',
-    color: '#7DFFB3',
-    hoist: false,
-    mentionable: false,
-    permissions: [],
-    kind: 'color',
-  },
-  {
-    name: '🔥・Rouge',
-    color: '#E74C3C',
-    hoist: false,
-    mentionable: false,
-    permissions: [],
-    kind: 'color',
-  },
-  {
-    name: '☀️・Or',
-    color: BRANDING.colors.founderGold,
-    hoist: false,
-    mentionable: false,
-    permissions: [],
-    kind: 'color',
-  },
+  }),
+  role(ROLE_NAMES.member, '#2ECC71', 'hierarchy'),
+  role(ROLE_NAMES.muted, '#555555', 'hierarchy'),
+  role(ROLE_NAMES.pending, BRANDING.colors.coldGrey, 'hierarchy'),
 ];
 
-export const INTEREST_ROLE_NAMES = SERVER_ROLES.filter((role) => role.kind === 'interest').map(
-  (role) => role.name,
-);
-export const NOTIFICATION_ROLE_NAMES = SERVER_ROLES.filter(
-  (role) => role.kind === 'notification',
-).map((role) => role.name);
-export const COLOR_ROLE_NAMES = SERVER_ROLES.filter((role) => role.kind === 'color').map(
-  (role) => role.name,
-);
+export const UNIVERSE_ROLES: RoleConfig[] = [
+  role(ROLE_NAMES.gaming, BRANDING.colors.lavender, 'universe'),
+  role(ROLE_NAMES.animeManga, '#E91E63', 'universe'),
+  role(ROLE_NAMES.filmsSeries, '#FFB347', 'universe'),
+  role(ROLE_NAMES.music, '#9B59B6', 'universe'),
+  role(ROLE_NAMES.creative, '#00D1FF', 'universe'),
+  role(ROLE_NAMES.tech, '#1ABC9C', 'universe'),
+];
+
+export const GAME_ROLES: RoleConfig[] = [
+  role(ROLE_NAMES.valorant, '#FF4655', 'game'),
+  role(ROLE_NAMES.minecraft, '#2ECC71', 'game'),
+  role(ROLE_NAMES.gta, '#1ABC9C', 'game'),
+  role(ROLE_NAMES.callOfDuty, '#7F8C8D', 'game'),
+  role(ROLE_NAMES.leagueOfLegends, '#C89B3C', 'game'),
+  role(ROLE_NAMES.fortnite, '#5865F2', 'game'),
+  role(ROLE_NAMES.roblox, '#ECF0F1', 'game'),
+  role(ROLE_NAMES.rocketLeague, '#3498DB', 'game'),
+  role(ROLE_NAMES.fpsMisc, '#E74C3C', 'game'),
+  role(ROLE_NAMES.gamesMisc, '#F1C40F', 'game'),
+];
+
+export const NOTIFICATION_ROLES: RoleConfig[] = [
+  role(ROLE_NAMES.announcements, BRANDING.colors.founderGold, 'notification'),
+  role(ROLE_NAMES.gameNight, BRANDING.colors.founderGold, 'notification'),
+  role(ROLE_NAMES.watchParty, BRANDING.colors.founderGold, 'notification'),
+  role(ROLE_NAMES.patchNotes, BRANDING.colors.founderGold, 'notification'),
+  role(ROLE_NAMES.freeGames, BRANDING.colors.founderGold, 'notification'),
+  role(ROLE_NAMES.polls, BRANDING.colors.founderGold, 'notification'),
+];
+
+export const COLOR_ROLES: RoleConfig[] = [
+  role(ROLE_NAMES.colorGold, BRANDING.colors.founderGold, 'color'),
+  role(ROLE_NAMES.colorNightPurple, '#3B1B5A', 'color'),
+  role(ROLE_NAMES.colorNeonBlue, '#00D1FF', 'color'),
+  role(ROLE_NAMES.colorBloodRed, '#8B0000', 'color'),
+  role(ROLE_NAMES.colorJadeGreen, '#00A86B', 'color'),
+  role(ROLE_NAMES.colorBlack, '#111111', 'color'),
+  role(ROLE_NAMES.colorMoonWhite, '#ECF0F1', 'color'),
+  role(ROLE_NAMES.colorSakura, '#FF8FB3', 'color'),
+];
+
+export const BOT_ROLES: RoleConfig[] = [
+  role(ROLE_NAMES.bot, '#5865F2', 'bot', [], { hoist: true, mentionable: false }),
+  role(
+    ROLE_NAMES.botModeration,
+    '#3498DB',
+    'bot',
+    [PermissionFlagsBits.ManageRoles, PermissionFlagsBits.ManageMessages],
+    { hoist: true, mentionable: false },
+  ),
+  role(
+    ROLE_NAMES.botAutomod,
+    '#E74C3C',
+    'bot',
+    [PermissionFlagsBits.ManageMessages, PermissionFlagsBits.ModerateMembers],
+    { hoist: true, mentionable: false },
+  ),
+  role(
+    ROLE_NAMES.botTickets,
+    '#9B59B6',
+    'bot',
+    [PermissionFlagsBits.ManageChannels, PermissionFlagsBits.ManageMessages],
+    { hoist: true, mentionable: false },
+  ),
+  role(
+    ROLE_NAMES.botVoice,
+    '#1ABC9C',
+    'bot',
+    [PermissionFlagsBits.ManageChannels, PermissionFlagsBits.MoveMembers],
+    { hoist: true, mentionable: false },
+  ),
+  role(ROLE_NAMES.botEvents, '#E67E22', 'bot', [], { hoist: true, mentionable: false }),
+  role(ROLE_NAMES.botStats, '#95A5A6', 'bot', [], { hoist: true, mentionable: false }),
+  role(ROLE_NAMES.botNews, '#F1C40F', 'bot', [], { hoist: true, mentionable: false }),
+  role(ROLE_NAMES.botStarboard, '#F39C12', 'bot', [], { hoist: true, mentionable: false }),
+  role(ROLE_NAMES.botMusic, '#2ECC71', 'bot', [], { hoist: true, mentionable: false }),
+];
+
+export const SERVER_ROLES: RoleConfig[] = [
+  ...HIERARCHY_ROLES,
+  ...UNIVERSE_ROLES,
+  ...GAME_ROLES,
+  ...NOTIFICATION_ROLES,
+  ...COLOR_ROLES,
+  ...BOT_ROLES,
+];
+
+export const GAMING_ROLE_TREE = {
+  parent: ROLE_NAMES.gaming,
+  children: GAME_ROLES.map((roleConfig) => roleConfig.name),
+  note: 'Futur panel de rôles externe: ajouter 🎮・Gaming quand un jeu est choisi; retirer les rôles jeux quand 🎮・Gaming est retiré.',
+} as const;
+
+export const UNIVERSE_ROLE_NAMES = UNIVERSE_ROLES.map((roleConfig) => roleConfig.name);
+export const GAME_ROLE_NAMES = GAME_ROLES.map((roleConfig) => roleConfig.name);
+export const INTEREST_ROLE_NAMES = [...UNIVERSE_ROLE_NAMES, ...GAME_ROLE_NAMES];
+export const NOTIFICATION_ROLE_NAMES = NOTIFICATION_ROLES.map((roleConfig) => roleConfig.name);
+export const COLOR_ROLE_NAMES = COLOR_ROLES.map((roleConfig) => roleConfig.name);

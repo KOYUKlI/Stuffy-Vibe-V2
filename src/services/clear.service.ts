@@ -64,6 +64,7 @@ export class ClearSafetyError extends Error {
 const EXTERNAL_BOT_ROLE_NAMES = new Set<string>([
   ROLE_NAMES.bot,
   ROLE_NAMES.botModeration,
+  ROLE_NAMES.botAutomod,
   ROLE_NAMES.botTickets,
   ROLE_NAMES.botVoice,
   ROLE_NAMES.botEvents,

@@ -136,7 +136,7 @@ Rôles :
 - `🤖・Bot`
 - `🛡️・Bot Automod`
 
-Le rôle `🛡️・Bot Automod` n’existe pas encore dans la configuration TypeScript actuelle. Ajoute-le à `src/config/roles.config.ts` lors d’une prochaine sync.
+Le rôle `🛡️・Bot Automod` est prévu dans `src/config/roles.config.ts` et peut être créé via `/setup` ou `/sync`.
 
 Salons :
 
@@ -187,9 +187,10 @@ Rôles à attribuer :
 
 Salons :
 
-- Panel : `🎫・tickets`
+- Panel : `🎫・support`
 - Signalements : `🚨・signalements`
-- Logs : `🧾・logs`
+- Logs tickets : `🎫・tickets-logs`
+- Logs généraux : `🧾・logs`
 
 Permissions minimales :
 
@@ -203,7 +204,7 @@ Permissions minimales :
 
 Configuration :
 
-1. Crée un panel de ticket dans `🎫・tickets`.
+1. Crée un panel de ticket dans `🎫・support`.
 2. Configure une catégorie ou un espace de tickets privés.
 3. Donne accès aux tickets au staff uniquement.
 4. Configure les logs de création, fermeture et suppression dans `🧾・logs`.
@@ -216,7 +217,7 @@ Checklist de test :
 - Les autres membres ne voient pas le ticket.
 - Le staff peut fermer le ticket.
 - Les logs apparaissent dans `🧾・logs`.
-- Le panel reste lisible dans `🎫・tickets`.
+- Le panel reste lisible dans `🎫・support`.
 
 ## 4. VoiceMaster ou TempVoice
 
@@ -232,7 +233,7 @@ Rôles à attribuer :
 Salons :
 
 - Déclencheur : `➕・créer-un-vocal`
-- Catégorie : `🔊・VOCAUX`
+- Catégorie : `✹・VOCAUX`
 
 Permissions attendues :
 
@@ -246,7 +247,7 @@ Permissions attendues :
 Configuration :
 
 1. Défini `➕・créer-un-vocal` comme salon déclencheur.
-2. Configure la création des vocaux temporaires dans `🔊・VOCAUX`.
+2. Configure la création des vocaux temporaires dans `✹・VOCAUX`.
 3. Donne au créateur du vocal les droits de base sur son salon temporaire si souhaité.
 4. Configure la suppression automatique quand le salon est vide.
 
@@ -273,8 +274,8 @@ Rôles à attribuer :
 
 Salons et rôles :
 
-- Events : `📅・events`
-- Annonces : `📌・annonces-potes`
+- Annonces : `📌・annonces`
+- Watch parties : `🎬・watch-party` et `🎬・watch-party-anime`
 - Rôles notifications : `🎮・Game Night`, `🎬・Watch Party`
 
 Permissions minimales :
@@ -288,14 +289,14 @@ Permissions minimales :
 
 Configuration :
 
-1. Configure `📅・events` comme salon principal.
-2. Configure `📌・annonces-potes` pour les annonces importantes si besoin.
+1. Configure `📌・annonces` pour les annonces importantes si besoin.
+2. Utilise `🎬・watch-party` et `🎬・watch-party-anime` pour les sessions dédiées.
 3. Autorise uniquement les mentions des rôles `🎮・Game Night` et `🎬・Watch Party`.
 4. Crée un event test.
 
 Checklist de test :
 
-- Un event s’affiche dans `📅・events`.
+- Un event ou une annonce s’affiche dans le salon prévu.
 - Les membres peuvent s’inscrire.
 - Les rappels fonctionnent.
 - Les rôles `🎮・Game Night` ou `🎬・Watch Party` sont mentionnés correctement.
@@ -392,13 +393,13 @@ Rôles à attribuer :
 
 Salon :
 
-- `⭐・best-of`
+- Aucun salon Starboard dédié n’est créé par défaut. Ajoute un salon `⭐・best-of` plus tard si le serveur en a vraiment besoin.
 
 Réglages recommandés :
 
 - Seuil : 2 ou 3 étoiles.
 - Ignorer STAFF, logs et tickets.
-- Ignorer `🔒・STAFF`, `🧾・logs`, `🎫・tickets`, `🚨・signalements`, `🗃️・archives`.
+- Ignorer `▣・STAFF`, `🧾・logs`, `🎫・tickets-logs`, `🚨・signalements`, `📦・archives-staff`.
 
 Permissions minimales :
 
@@ -411,14 +412,14 @@ Permissions minimales :
 
 Configuration :
 
-1. Configure `⭐・best-of` comme salon Starboard.
+1. Crée puis configure `⭐・best-of` comme salon Starboard si tu l’ajoutes.
 2. Défini le seuil à 2 ou 3.
 3. Exclue les salons staff, logs et tickets.
 4. Empêche l’auto-star si le bot le permet.
 
 Checklist de test :
 
-- Un message avec assez d’étoiles apparaît dans `⭐・best-of`.
+- Un message avec assez d’étoiles apparaît dans le salon Starboard choisi.
 - Les messages staff ne peuvent pas apparaître.
 - Les tickets ne peuvent pas apparaître.
 - Le bot met à jour le post si le nombre d’étoiles change.
@@ -438,7 +439,7 @@ Rôles à attribuer :
 
 Salons :
 
-- Stats : `📊・stats`
+- Aucun salon stats dédié n’est créé par défaut.
 - Logs : `🧾・logs`
 
 Permissions minimales :
@@ -451,14 +452,14 @@ Permissions minimales :
 
 Configuration :
 
-1. Configure `📊・stats` comme salon d’affichage.
+1. Crée un salon stats dédié si tu veux afficher des statistiques publiquement.
 2. Configure les logs techniques dans `🧾・logs` si disponible.
 3. Limite les statistiques visibles aux données utiles.
 4. Évite d’exposer des stats sensibles si inutile.
 
 Checklist de test :
 
-- Les stats apparaissent dans `📊・stats`.
+- Les stats apparaissent dans le salon choisi.
 - Les stats ne révèlent pas d’informations sensibles.
 - Le bot n’écrit pas dans les salons publics non prévus.
 - Les logs restent dans `🧾・logs`.
@@ -565,7 +566,7 @@ Après avoir configuré tous les bots :
 2. Vérifie qu’il ne voit que `👋・bienvenue`, `📜・règlement`, `🧭・guide`.
 3. Valide-le via Carl-bot.
 4. Vérifie qu’il reçoit `✅・Membre` et perd `🕯️・À valider`.
-5. Vérifie l’accès à `🎭・rôles`, LOUNGE, GAMING, CULTURE, ACTIVITÉ, BOTS et VOCAUX.
+5. Vérifie l’accès à `🎭・rôles`, `◆・HUB`, `✹・VOCAUX`, puis aux univers selon les rôles choisis.
 6. Ouvre un ticket test.
 7. Crée un vocal temporaire test.
 8. Crée un event test.

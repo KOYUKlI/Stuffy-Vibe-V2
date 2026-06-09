@@ -10,7 +10,7 @@ Lance le bot seulement pour :
 - audit de structure ;
 - synchronisation de rôles, salons ou permissions ;
 - création ou suppression manuelle d’un rôle ou salon ;
-- clear/rebuild de la structure gérée ;
+- clear/rebuild des salons ou de la structure projet ;
 - export de configuration.
 
 Tu peux arrêter le bot après l’opération. Discord conserve les rôles, salons et permissions.
