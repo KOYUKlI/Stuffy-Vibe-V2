@@ -11,7 +11,7 @@ interface ExportResult {
 
 export class ExportService {
   public async exportGuild(guild: Guild, prefix = 'server-config'): Promise<ExportResult> {
-    const fetchedChannels = await guild.channels.fetch();
+    const [, fetchedChannels] = await Promise.all([guild.roles.fetch(), guild.channels.fetch()]);
     const channels = [...fetchedChannels.values()].filter(
       (channel): channel is NonThreadGuildBasedChannel => Boolean(channel),
     );

@@ -6,7 +6,7 @@ import { hasProvisioningAccess } from '../utils/permissions.js';
 export const setupCommand: SlashCommand = {
   data: new SlashCommandBuilder()
     .setName('setup')
-    .setDescription('Crée la structure complète du serveur sans supprimer l’existant.')
+    .setDescription('Prépare la structure complète, en dry-run par défaut.')
     .addBooleanOption((option) =>
       option.setName('dry-run').setDescription('Afficher ce qui serait fait sans modifier.'),
     ),
@@ -18,7 +18,7 @@ export const setupCommand: SlashCommand = {
     if (!interaction.guild) throw new Error('Commande utilisable uniquement dans un serveur.');
 
     await interaction.deferReply({ ephemeral: true });
-    const dryRun = interaction.options.getBoolean('dry-run') ?? false;
+    const dryRun = interaction.options.getBoolean('dry-run') ?? true;
     const result = await new SetupService().run(interaction.guild, dryRun);
     await interaction.editReply(
       dryRun

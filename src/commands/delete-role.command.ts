@@ -1,8 +1,13 @@
 import { SlashCommandBuilder } from 'discord.js';
 import type { Role } from 'discord.js';
 import type { SlashCommand } from './command.js';
+import { ExportService } from '../services/export.service.js';
 import { hasDeletionAccess } from '../utils/permissions.js';
-import { CONFIRMATION_WORD, isConfirmed, isProtectedRole } from '../utils/safety.js';
+import {
+  deletionConfirmation,
+  isDeletionConfirmed,
+  roleDeletionBlockReason,
+} from '../utils/safety.js';
 
 export const deleteRoleCommand: SlashCommand = {
   data: new SlashCommandBuilder()
@@ -14,7 +19,7 @@ export const deleteRoleCommand: SlashCommand = {
     .addStringOption((option) =>
       option
         .setName('confirm')
-        .setDescription(`Doit valoir exactement ${CONFIRMATION_WORD}.`)
+        .setDescription('Doit valoir exactement DELETE_ROLE:<ID_DU_ROLE>.')
         .setRequired(true),
     ),
   async execute(interaction) {
@@ -22,33 +27,42 @@ export const deleteRoleCommand: SlashCommand = {
       await interaction.reply({ content: 'Accès refusé.', ephemeral: true });
       return;
     }
+    if (!interaction.guild) throw new Error('Commande utilisable uniquement dans un serveur.');
 
     const role = interaction.options.getRole('role', true) as Role;
-    if (isProtectedRole(role)) {
+    if (role.guild.id !== interaction.guild.id) {
       await interaction.reply({
-        content: `Rôle protégé, suppression refusée : ${role.name}`,
+        content: 'Suppression refusée : le rôle ne vient pas de ce serveur.',
         ephemeral: true,
       });
       return;
     }
-    if (role.managed) {
+    const blockReason = roleDeletionBlockReason(role);
+    if (blockReason) {
       await interaction.reply({
-        content: `Rôle géré par une intégration, suppression refusée : ${role.name}`,
+        content: `Suppression refusée pour ${role.name} : ${blockReason}`,
         ephemeral: true,
       });
       return;
     }
 
     const confirm = interaction.options.getString('confirm', true);
-    if (!isConfirmed(confirm)) {
+    const expectedConfirmation = deletionConfirmation('ROLE', role.id);
+    if (!isDeletionConfirmed(confirm, 'ROLE', role.id)) {
       await interaction.reply({
-        content: `Suppression annulée. Écris exactement ${CONFIRMATION_WORD}.`,
+        content: `Suppression annulée. Écris exactement ${expectedConfirmation}.`,
         ephemeral: true,
       });
       return;
     }
 
+    await interaction.deferReply({ ephemeral: true });
+    const backup = await new ExportService().exportGuild(
+      interaction.guild,
+      'backup-before-delete-role',
+    );
+    const roleName = role.name;
     await role.delete(`Suppression provisioning par ${interaction.user.tag}`);
-    await interaction.reply({ content: `Rôle supprimé : ${role.name}`, ephemeral: true });
+    await interaction.editReply(`Rôle supprimé : ${roleName}\nBackup : ${backup.filePath}`);
   },
 };

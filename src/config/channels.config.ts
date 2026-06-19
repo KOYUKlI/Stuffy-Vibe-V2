@@ -55,7 +55,7 @@ function forum(config: Omit<ChannelConfig, 'type' | 'fallbackType'>): ChannelCon
 
 const gamingGeneralAccess = [ROLE_NAMES.gaming];
 const watchPartyAccess = [ROLE_NAMES.filmsSeries, ROLE_NAMES.animeManga];
-const elderAccess = [ROLE_NAMES.elder, ROLE_NAMES.privateCircle];
+const elderAccess = [ROLE_NAMES.elder];
 const privateAccess = [ROLE_NAMES.privateCircle];
 
 export const SERVER_CATEGORIES: CategoryConfig[] = [
@@ -260,13 +260,6 @@ export const SERVER_CATEGORIES: CategoryConfig[] = [
         accessRoles: [ROLE_NAMES.music],
         botRoles: [ROLE_NAMES.botMusic],
       }),
-      voice({ name: '⭐・vocal-anciens', profile: 'member-chat', accessRoles: elderAccess }),
-      voice({
-        name: '💎・vocal-privé',
-        profile: 'member-chat',
-        accessRoles: privateAccess,
-        staffAccess: 'founder-only',
-      }),
     ],
   },
   {
@@ -334,3 +327,15 @@ export const SERVER_CATEGORIES: CategoryConfig[] = [
     ],
   },
 ];
+
+export function resolveChannelConfig(
+  categoryConfig: CategoryConfig,
+  channelConfig: ChannelConfig,
+): ChannelConfig {
+  return {
+    ...channelConfig,
+    accessRoles: channelConfig.accessRoles ?? categoryConfig.accessRoles,
+    staffAccess: channelConfig.staffAccess ?? categoryConfig.staffAccess,
+    botRoles: [...new Set([...(categoryConfig.botRoles ?? []), ...(channelConfig.botRoles ?? [])])],
+  };
+}

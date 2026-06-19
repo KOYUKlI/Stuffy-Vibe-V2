@@ -12,15 +12,15 @@ Il voit seulement :
 
 Il ne peut écrire nulle part tant qu’il n’est pas validé.
 
-Carl-bot gère l’autorole `🕯️・À valider`, le greeting dans `👋・bienvenue` et le DM de bienvenue optionnel.
+Sapphire gère l’autorole `🕯️・À valider`, le greeting dans `👋・bienvenue` et le DM de bienvenue optionnel.
 
 ## Validation
 
 Le membre lit `📜・règlement`.
 
-La validation est directement prévue dans ce salon, avec un bouton ou une réaction configuré par Carl-bot. Le bot custom ne valide personne et n’attribue aucun rôle automatiquement.
+La validation est directement prévue dans ce salon, avec un bouton ou une réaction configuré par Sapphire. Le bot custom ne valide personne et n’attribue aucun rôle automatiquement.
 
-Après validation, Carl-bot donne le rôle `✅・Membre` et retire `🕯️・À valider`.
+Après validation, Sapphire donne le rôle `✅・Membre` et retire `🕯️・À valider`.
 
 ## Serveur principal
 
@@ -31,7 +31,7 @@ Avec `✅・Membre`, le membre débloque :
 - `➕・créer-un-vocal`
 - `🔊・vocal-général`
 
-Il peut choisir ses rôles avec Carl-bot, participer dans `💬・général`, poster dans `📸・partage`, utiliser `🎫・support`, voter dans `📊・sondages` et rejoindre le vocal général.
+Il peut choisir ses rôles avec Sapphire, participer dans `💬・général`, poster dans `📸・partage`, utiliser `🎫・support`, voter dans `📊・sondages` et rejoindre le vocal général.
 
 Les univers restent cachés tant qu’il n’a pas choisi le rôle correspondant :
 

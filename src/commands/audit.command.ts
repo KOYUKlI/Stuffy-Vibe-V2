@@ -16,7 +16,8 @@ export const auditCommand: SlashCommand = {
     }
     if (!interaction.guild) throw new Error('Commande utilisable uniquement dans un serveur.');
 
-    const report = new AuditService().run(interaction.guild);
+    await interaction.deferReply({ ephemeral: true });
+    const report = await new AuditService().run(interaction.guild);
     const embed = new EmbedBuilder()
       .setColor(BRANDING.colors.midnightBlue)
       .setTitle('Audit provisioning')
@@ -31,6 +32,23 @@ export const auditCommand: SlashCommand = {
           value: truncate(formatList(report.missingChannels, 'Aucun.')),
         },
         {
+          name: 'Rôles / hiérarchie',
+          value: truncate(formatList(report.roleIssues, 'Aucun problème détecté.')),
+        },
+        {
+          name: 'Structure inattendue',
+          value: truncate(
+            formatList(
+              [
+                ...report.structureIssues,
+                ...report.unexpectedCategories.map((name) => `Catégorie: ${name}`),
+                ...report.unexpectedChannels.map((name) => `Salon: ${name}`),
+              ],
+              'Aucun élément inattendu.',
+            ),
+          ),
+        },
+        {
           name: 'Permissions critiques',
           value: truncate(formatList(report.permissionIssues, 'Aucun problème détecté.')),
         },
@@ -42,6 +60,6 @@ export const auditCommand: SlashCommand = {
       .setFooter({ text: BRANDING.footer })
       .setTimestamp();
 
-    await interaction.reply({ embeds: [embed], ephemeral: true });
+    await interaction.editReply({ embeds: [embed] });
   },
 };

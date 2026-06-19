@@ -21,10 +21,10 @@ Le bot custom ne gère pas l’automod, les greetings, la validation, les reacti
 
 Ces éléments sont configurés manuellement :
 
-- Carl-bot : autorole, greetings, validation règlement, reaction roles.
+- Sapphire : autorole, greetings, validation règlement et panels de rôles.
 - Dyno : automod spécialisé, anti-spam, anti-mentions massives, anti-invitations externes, logs automod.
 
-Le bot custom peut être arrêté après provisioning. Carl-bot et Dyno restent les bots opérationnels pour leurs périmètres respectifs.
+Le bot custom peut être arrêté après provisioning. Sapphire et Dyno restent les bots opérationnels pour leurs périmètres respectifs.
 
 ## Quand utiliser `/setup`
 

@@ -34,7 +34,7 @@ export class RebuildService {
   private readonly syncService = new SyncService();
 
   public async rebuild(guild: Guild, options: RebuildOptions): Promise<RebuildResult> {
-    const beforeAudit = this.auditService.run(guild);
+    const beforeAudit = await this.auditService.run(guild);
     const clearScope = options.clearProjectRoles ? 'all-project' : 'all-channels';
     const plannedClearResult = await this.clearService.clear(guild, {
       dryRun: true,
@@ -86,6 +86,8 @@ export class RebuildService {
         channelsCreated: beforeAudit.missingChannels.length + beforeAudit.missingCategories.length,
         permissionsApplied: this.configuredPermissionTargetCount(),
         auditIssues: [
+          ...beforeAudit.roleIssues,
+          ...beforeAudit.structureIssues,
           ...beforeAudit.permissionIssues,
           ...beforeAudit.duplicateIssues,
           ...plannedClearResult.warnings,
@@ -108,7 +110,7 @@ export class RebuildService {
       backup: false,
     });
 
-    const afterAudit = this.auditService.run(guild);
+    const afterAudit = await this.auditService.run(guild);
 
     return {
       blocked: false,
@@ -128,6 +130,8 @@ export class RebuildService {
         ...afterAudit.missingRoles,
         ...afterAudit.missingCategories,
         ...afterAudit.missingChannels,
+        ...afterAudit.roleIssues,
+        ...afterAudit.structureIssues,
         ...afterAudit.permissionIssues,
         ...afterAudit.duplicateIssues,
         ...realClearResult.warnings,

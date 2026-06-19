@@ -6,7 +6,7 @@ import { hasProvisioningAccess } from '../utils/permissions.js';
 export const syncCommand: SlashCommand = {
   data: new SlashCommandBuilder()
     .setName('sync')
-    .setDescription('Synchronise rôles, catégories, salons et permissions.')
+    .setDescription('Synchronise la structure, en dry-run par défaut.')
     .addBooleanOption((option) =>
       option.setName('dry-run').setDescription('Afficher ce qui serait fait sans modifier.'),
     )
@@ -20,7 +20,7 @@ export const syncCommand: SlashCommand = {
     }
     if (!interaction.guild) throw new Error('Commande utilisable uniquement dans un serveur.');
 
-    const dryRun = interaction.options.getBoolean('dry-run') ?? false;
+    const dryRun = interaction.options.getBoolean('dry-run') ?? true;
     const force = interaction.options.getBoolean('force') ?? false;
 
     await interaction.deferReply({ ephemeral: true });

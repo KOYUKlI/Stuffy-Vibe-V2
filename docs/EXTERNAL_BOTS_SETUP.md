@@ -17,7 +17,7 @@ Le bot custom du projet reste un provisioning bot : il prépare la structure, le
 
 ## Ordre d’installation recommandé
 
-1. Carl-bot
+1. Sapphire
 2. Dyno
 3. Ticket Tool
 4. VoiceMaster
@@ -44,12 +44,14 @@ Selon le bot, commence par :
 - Add Reactions si le bot utilise des réactions
 - Use External Emojis si nécessaire
 - Manage Messages seulement pour Dyno, logs, starboard ou modération légère
-- Manage Roles seulement pour Carl-bot quand il attribue des rôles
+- Manage Roles seulement pour Sapphire quand il attribue des rôles
 - Move Members et Manage Channels seulement pour VoiceMaster/TempVoice
 
 Évite `Administrator`. Si un bot demande trop de permissions, limite-le avec les permissions de salon.
 
-## 1. Carl-bot
+## 1. Sapphire
+
+La configuration exacte des panels, whitelists, couleurs exclusives et rôles Jeux est versionnée dans [SAPPHIRE_SETUP.md](SAPPHIRE_SETUP.md).
 
 Objectif :
 
@@ -61,7 +63,7 @@ Objectif :
 - Retrait du rôle `🕯️・À valider`.
 - Sélection de rôles dans `🎭・rôles`.
 
-Carl-bot ne gère pas l’automod, les tickets, les vocaux temporaires, les events, les stats ou la musique.
+Sapphire ne gère pas l’automod, les tickets, les vocaux temporaires, les events, les stats ou la musique.
 
 Rôles à attribuer :
 
@@ -116,7 +118,7 @@ Checklist de test :
 - Le bouton/réaction retire `🕯️・À valider`.
 - `🎭・rôles` devient visible après validation.
 - Les rôles sélectionnés dans `🎭・rôles` s’ajoutent et se retirent correctement.
-- Carl-bot ne gère pas l’automod.
+- Sapphire ne gère pas l’automod.
 
 ## 2. Dyno
 
@@ -551,8 +553,8 @@ Checklist de test :
 - `Administrator` est donné par facilité alors que des permissions ciblées suffisent.
 - Le bot peut écrire dans trop de salons.
 - Les logs sont envoyés dans un salon public.
-- Carl-bot gère l’automod alors que Dyno doit le faire.
-- Dyno gère les rôles de validation alors que Carl-bot doit le faire.
+- Sapphire gère l’automod alors que Dyno doit le faire.
+- Dyno gère les rôles de validation alors que Sapphire doit le faire.
 - Les tickets sont visibles par tout le monde.
 - Le Starboard inclut des salons staff.
 - Les rôles notifications sont mentionnés trop souvent.
@@ -564,7 +566,7 @@ Après avoir configuré tous les bots :
 
 1. Crée un compte ou rôle de test non validé.
 2. Vérifie qu’il ne voit que `👋・bienvenue`, `📜・règlement`, `🧭・guide`.
-3. Valide-le via Carl-bot.
+3. Valide-le via Sapphire.
 4. Vérifie qu’il reçoit `✅・Membre` et perd `🕯️・À valider`.
 5. Vérifie l’accès à `🎭・rôles`, `◆・HUB`, `✹・VOCAUX`, puis aux univers selon les rôles choisis.
 6. Ouvre un ticket test.

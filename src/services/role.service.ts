@@ -1,5 +1,12 @@
 import type { Guild, Role } from 'discord.js';
-import { ROLE_NAMES, SERVER_ROLES } from '../config/roles.config.js';
+import {
+  COLOR_ROLE_NAMES,
+  GAME_ROLE_NAMES,
+  NOTIFICATION_ROLE_NAMES,
+  ROLE_NAMES,
+  SERVER_ROLES,
+  UNIVERSE_ROLE_NAMES,
+} from '../config/roles.config.js';
 import { logger } from '../utils/logger.js';
 
 export class RoleService {
@@ -65,10 +72,8 @@ export class RoleService {
     const botHighest = guild.members.me?.roles.highest.position;
     if (!botHighest) return;
 
-    const hierarchy = [
-      ROLE_NAMES.founder,
-      ROLE_NAMES.admin,
-      ROLE_NAMES.moderator,
+    const staffHierarchy = [ROLE_NAMES.founder, ROLE_NAMES.admin, ROLE_NAMES.moderator];
+    const managedHierarchy = [
       ROLE_NAMES.botModeration,
       ROLE_NAMES.botAutomod,
       ROLE_NAMES.botTickets,
@@ -78,27 +83,77 @@ export class RoleService {
       ROLE_NAMES.botNews,
       ROLE_NAMES.botStarboard,
       ROLE_NAMES.botMusic,
+      ...COLOR_ROLE_NAMES,
       ROLE_NAMES.privateCircle,
       ROLE_NAMES.elder,
       ROLE_NAMES.member,
+      ...UNIVERSE_ROLE_NAMES,
+      ...GAME_ROLE_NAMES,
+      ...NOTIFICATION_ROLE_NAMES,
       ROLE_NAMES.muted,
       ROLE_NAMES.pending,
       ROLE_NAMES.bot,
     ];
 
-    let position = Math.max(botHighest - 1, 1);
-    for (const roleName of hierarchy) {
-      const role = roles.get(roleName);
-      if (!role || role.managed || role.position === position) {
-        position = Math.max(position - 1, 1);
-        continue;
-      }
+    const externalBotRoles = this.externalBotRoles(guild);
+    const configuredStaffRoles = staffHierarchy
+      .map((roleName) => roles.get(roleName))
+      .filter((role): role is Role => Boolean(role));
+    const lowestStaffPosition = configuredStaffRoles.length
+      ? Math.min(...configuredStaffRoles.map((role) => role.position))
+      : botHighest;
+    const highestExternalBotPosition = externalBotRoles.length
+      ? Math.max(...externalBotRoles.map((role) => role.position))
+      : 0;
+    const startPosition = externalBotRoles.length
+      ? Math.min(...externalBotRoles.map((role) => role.position)) - 1
+      : Math.max(botHighest - staffHierarchy.length - 1, 1);
+    const requiredSlots = managedHierarchy.filter((roleName) => roles.has(roleName)).length;
 
-      await role.setPosition(position, {
-        reason: 'Placement des rôles de provisioning sous le rôle du bot',
-      });
+    if (highestExternalBotPosition >= lowestStaffPosition || startPosition < requiredSlots) {
+      const anchors = externalBotRoles.map((role) => `${role.name} (${role.position})`).join(', ');
+      throw new Error(
+        `Hiérarchie non sûre: place manuellement les vrais rôles bots sous le staff et assez haut. ` +
+          `Ancres détectées: ${anchors || 'aucune'}; ${requiredSlots} positions sont nécessaires dessous.`,
+      );
+    }
+
+    await this.placeRoleNames(roles, staffHierarchy, Math.max(botHighest - 1, 1));
+    await this.placeRoleNames(roles, managedHierarchy, startPosition);
+    logger.info(
+      `Hiérarchie placée: staff, ${externalBotRoles.length} ancre(s) bot externe(s), rôles spécialisés, couleurs et rôles membres.`,
+    );
+  }
+
+  private async placeRoleNames(
+    roles: Map<string, Role>,
+    roleNames: string[],
+    startPosition: number,
+  ): Promise<number> {
+    let position = startPosition;
+
+    for (const roleName of roleNames) {
+      const role = roles.get(roleName);
+      if (!role || role.managed) continue;
+
+      if (role.position !== position) {
+        await role.setPosition(position, {
+          reason: 'Placement hiérarchique des rôles de provisioning',
+        });
+      }
       position = Math.max(position - 1, 1);
     }
-    logger.info('Hiérarchie des rôles placée sous le rôle du bot quand possible.');
+
+    return position;
+  }
+
+  private externalBotRoles(guild: Guild): Role[] {
+    const customBotId = guild.members.me?.id;
+    return guild.roles.cache
+      .filter(
+        (role) => role.managed && Boolean(role.tags?.botId) && role.tags?.botId !== customBotId,
+      )
+      .sort((first, second) => second.position - first.position)
+      .map((role) => role);
   }
 }

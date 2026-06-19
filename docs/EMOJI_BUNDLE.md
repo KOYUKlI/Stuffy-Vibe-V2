@@ -70,7 +70,7 @@ Staff :
 4. Renomme-les avec les noms prévus.
 5. Teste leur affichage dans un salon privé staff.
 
-## Utilisation avec Carl-bot
+## Utilisation avec Sapphire
 
 Tu peux utiliser ces emojis dans :
 
@@ -79,7 +79,7 @@ Tu peux utiliser ces emojis dans :
 - boutons ou réactions de validation ;
 - panels de notifications.
 
-Carl-bot gère l’usage des emojis dans ses panels de validation et de rôles. Le provisioning bot custom ne le fait pas.
+Sapphire gère l'usage des emojis dans ses panels de validation et de rôles. Le provisioning bot custom ne le fait pas.
 
 ## À éviter
 

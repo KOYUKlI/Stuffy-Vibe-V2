@@ -10,9 +10,11 @@ import {
   BOT_TICKETS_ALLOW,
   BOT_VOICE_ALLOW,
   EVERYONE_DENY,
+  HIDDEN_CHANNEL_DENY,
   MEMBER_TEXT_ALLOW,
   MEMBER_VOICE_ALLOW,
   MUTED_DENY,
+  PENDING_DENY,
   PROVISIONING_BOT_ALLOW,
   READ_ONLY_DENY,
   STAFF_ALLOW,
@@ -153,8 +155,11 @@ export class PermissionService {
     const memberDeny = readonly ? READ_ONLY_DENY : [];
 
     return [
-      this.everyoneDeny(context, EVERYONE_DENY),
-      this.roleDeny(context, ROLE_NAMES.pending, [PermissionFlagsBits.ViewChannel]),
+      this.everyoneDeny(context, HIDDEN_CHANNEL_DENY),
+      this.roleDeny(context, ROLE_NAMES.pending, [
+        PermissionFlagsBits.ViewChannel,
+        ...PENDING_DENY,
+      ]),
       this.roleDeny(context, ROLE_NAMES.guest, [PermissionFlagsBits.ViewChannel]),
       this.roleAllow(context, ROLE_NAMES.member, memberAllow, memberDeny),
       this.roleAllow(context, ROLE_NAMES.elder, memberAllow, memberDeny),
@@ -183,8 +188,11 @@ export class PermissionService {
     const memberDeny = voice ? [] : READ_ONLY_DENY;
 
     return [
-      this.everyoneDeny(context, EVERYONE_DENY),
-      this.roleDeny(context, ROLE_NAMES.pending, [PermissionFlagsBits.ViewChannel]),
+      this.everyoneDeny(context, HIDDEN_CHANNEL_DENY),
+      this.roleDeny(context, ROLE_NAMES.pending, [
+        PermissionFlagsBits.ViewChannel,
+        ...PENDING_DENY,
+      ]),
       this.roleDeny(context, ROLE_NAMES.guest, [PermissionFlagsBits.ViewChannel]),
       this.roleAllow(context, ROLE_NAMES.member, memberAllow, memberDeny),
       this.roleAllow(context, ROLE_NAMES.elder, memberAllow, memberDeny),
@@ -224,16 +232,15 @@ export class PermissionService {
     staffAccess: StaffAccess = 'all',
   ): OverwriteResolvable[] {
     const readonly = profile === 'member-readonly' || profile === 'bot-publication';
-    const roleAllow = voice
-      ? MEMBER_VOICE_ALLOW
-      : readonly
-        ? [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.ReadMessageHistory]
-        : MEMBER_TEXT_ALLOW;
+    const roleAllow = voice ? MEMBER_VOICE_ALLOW : MEMBER_TEXT_ALLOW;
     const roleDeny = voice ? [] : readonly ? READ_ONLY_DENY : [];
 
     return [
-      this.everyoneDeny(context, EVERYONE_DENY),
-      this.roleDeny(context, ROLE_NAMES.pending, [PermissionFlagsBits.ViewChannel]),
+      this.everyoneDeny(context, HIDDEN_CHANNEL_DENY),
+      this.roleDeny(context, ROLE_NAMES.pending, [
+        PermissionFlagsBits.ViewChannel,
+        ...PENDING_DENY,
+      ]),
       this.roleDeny(context, ROLE_NAMES.guest, [PermissionFlagsBits.ViewChannel]),
       ...accessRoles.map((roleName) => this.roleAllow(context, roleName, roleAllow, roleDeny)),
       this.roleAllow(context, ROLE_NAMES.muted, [PermissionFlagsBits.ViewChannel], MUTED_DENY),

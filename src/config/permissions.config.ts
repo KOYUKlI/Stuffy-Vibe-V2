@@ -12,6 +12,12 @@ export const EVERYONE_DENY = [
   PermissionFlagsBits.Speak,
 ];
 
+export const HIDDEN_CHANNEL_DENY = [
+  PermissionFlagsBits.ViewChannel,
+  PermissionFlagsBits.CreateInstantInvite,
+  PermissionFlagsBits.MentionEveryone,
+];
+
 export const READ_ONLY_DENY = [
   PermissionFlagsBits.SendMessages,
   PermissionFlagsBits.CreatePublicThreads,
@@ -22,19 +28,12 @@ export const READ_ONLY_DENY = [
   PermissionFlagsBits.MentionEveryone,
 ];
 
-export const MEMBER_TEXT_ALLOW = [
-  PermissionFlagsBits.ViewChannel,
-  PermissionFlagsBits.SendMessages,
-  PermissionFlagsBits.AddReactions,
-  PermissionFlagsBits.EmbedLinks,
-  PermissionFlagsBits.AttachFiles,
-  PermissionFlagsBits.ReadMessageHistory,
-  PermissionFlagsBits.CreatePublicThreads,
-  PermissionFlagsBits.SendMessagesInThreads,
-];
+export const MEMBER_TEXT_ALLOW = [PermissionFlagsBits.ViewChannel];
 
-export const MEMBER_VOICE_ALLOW = [
-  PermissionFlagsBits.ViewChannel,
+export const MEMBER_VOICE_ALLOW = [PermissionFlagsBits.ViewChannel];
+
+export const PENDING_DENY = [
+  ...READ_ONLY_DENY,
   PermissionFlagsBits.Connect,
   PermissionFlagsBits.Speak,
 ];

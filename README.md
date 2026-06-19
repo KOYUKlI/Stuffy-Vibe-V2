@@ -88,9 +88,9 @@ Lance le bot uniquement quand tu dois provisionner ou maintenir la structure. Un
 - `/sync dry-run force` : synchronise la structure, avec mode dry-run possible.
 - `/sync-permissions dry-run` : réapplique uniquement les permissions.
 - `/create-channel` : crée un salon texte, vocal ou forum.
-- `/delete-channel channel confirm` : supprime seulement si `confirm` vaut `CONFIRM`.
+- `/delete-channel channel confirm` : backup puis suppression si `confirm` vaut `DELETE_CHANNEL:<ID>`.
 - `/create-role` : crée un rôle sans permission `Administrator`.
-- `/delete-role role confirm` : supprime seulement si `confirm` vaut `CONFIRM`.
+- `/delete-role role confirm` : backup puis suppression si `confirm` vaut `DELETE_ROLE:<ID>` ; les rôles configurés sont protégés.
 - `/export-config` : exporte la structure actuelle dans `exports/server-config-*.json`.
 - `/clear-server scope dry-run confirm` : supprime selon le scope `managed`, `all-channels` ou `all-project`, avec `dry-run:true` par défaut.
 - `/rebuild-server dry-run confirm force-permissions clear-project-roles` : backup, clear de tous les salons, rebuild depuis les fichiers de config, puis synthèse/audit.
@@ -113,7 +113,7 @@ Le bot tente de créer des salons forum pour `🎞️・clips`, `💡・suggesti
 
 ## Parcours membre
 
-Le nouveau membre voit seulement `👋・bienvenue`, `📜・règlement` et `🧭・guide`. La validation est prévue directement dans `📜・règlement`, via Carl-bot. Une fois le rôle `✅・Membre` reçu, il débloque le serveur principal et peut accéder à `🎭・rôles`.
+Le nouveau membre voit seulement `👋・bienvenue`, `📜・règlement` et `🧭・guide`. La validation est prévue directement dans `📜・règlement`, via Sapphire. Une fois le rôle `✅・Membre` reçu, il débloque le serveur principal et peut accéder à `🎭・rôles`.
 
 Voir [docs/USER_JOURNEY.md](docs/USER_JOURNEY.md).
 
@@ -121,7 +121,7 @@ Voir [docs/USER_JOURNEY.md](docs/USER_JOURNEY.md).
 
 Configure manuellement les bots externes après le provisioning :
 
-- Carl-bot pour autorole, greetings, validation règlement, reaction roles et embeds permanents liés à l’entrée.
+- Sapphire pour autorole, greetings, validation règlement et panels de rôles.
 - Dyno pour automod léger, anti-spam, anti-mentions massives, anti-invitations externes et logs automod.
 - Ticket Tool pour tickets et signalements.
 - VoiceMaster ou TempVoice pour vocaux temporaires.
@@ -134,7 +134,7 @@ Configure manuellement les bots externes après le provisioning :
 - Jockie Music ou Kenku FM pour musique.
 - Beemo, Double Counter ou Wick pour sécurité si besoin.
 
-Voir [docs/EXTERNAL_BOTS_SETUP.md](docs/EXTERNAL_BOTS_SETUP.md) pour la configuration manuelle de Carl-bot, Dyno et des autres bots externes.
+Voir [docs/SAPPHIRE_SETUP.md](docs/SAPPHIRE_SETUP.md) pour les panels Sapphire et [docs/EXTERNAL_BOTS_SETUP.md](docs/EXTERNAL_BOTS_SETUP.md) pour Dyno et les autres bots externes.
 
 ## Opérations
 

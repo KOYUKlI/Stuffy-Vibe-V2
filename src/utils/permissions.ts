@@ -9,7 +9,9 @@ export function hasProvisioningAccess(interaction: ChatInputCommandInteraction):
   const member = interaction.member as GuildMember;
   return (
     member.permissions.has(PermissionFlagsBits.Administrator) ||
-    member.roles.cache.some((role: Role) => role.name === ROLE_NAMES.founder)
+    member.roles.cache.some((role: Role) =>
+      ([ROLE_NAMES.founder, ROLE_NAMES.admin] as string[]).includes(role.name),
+    )
   );
 }
 

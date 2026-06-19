@@ -32,14 +32,14 @@ Puis :
 /audit
 ```
 
-Les embeds permanents de règlement, validation, rôles ou plan des bots sont à créer manuellement avec Carl-bot. Le bot custom ne publie plus de messages permanents.
+Les messages permanents de règlement, validation et rôles sont à créer manuellement avec Sapphire. Le bot custom ne publie pas de messages permanents.
 
 ## Après `/setup` et `/audit`
 
 Ordre manuel recommandé :
 
 1. Upload les emojis custom depuis `docs/EMOJI_BUNDLE.md`.
-2. Configure Carl-bot :
+2. Configure Sapphire en suivant `docs/SAPPHIRE_SETUP.md` :
    - rôle `🤖・Bot` + `🛠️・Bot Modération` ;
    - autorole `🕯️・À valider` ;
    - greetings dans `👋・bienvenue` ;

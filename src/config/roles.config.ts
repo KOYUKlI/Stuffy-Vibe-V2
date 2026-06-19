@@ -60,13 +60,6 @@ export const ROLE_NAMES = {
   botMusic: '🎵・Bot Music',
 } as const;
 
-export const PROTECTED_ROLE_NAMES = [
-  ROLE_NAMES.founder,
-  ROLE_NAMES.admin,
-  ROLE_NAMES.moderator,
-  ROLE_NAMES.member,
-] as const;
-
 function role(
   name: string,
   color: ColorResolvable,
@@ -88,7 +81,7 @@ function role(
   };
 }
 
-export const HIERARCHY_ROLES: RoleConfig[] = [
+export const STAFF_ROLES: RoleConfig[] = [
   role(ROLE_NAMES.founder, BRANDING.colors.founderGold, 'hierarchy', [], {
     hoist: true,
     mentionable: false,
@@ -117,6 +110,9 @@ export const HIERARCHY_ROLES: RoleConfig[] = [
     ],
     { hoist: true, mentionable: false },
   ),
+];
+
+export const PRIVATE_ACCESS_ROLES: RoleConfig[] = [
   role(ROLE_NAMES.privateCircle, '#ECF0F1', 'hierarchy', [], {
     hoist: true,
     mentionable: false,
@@ -125,9 +121,30 @@ export const HIERARCHY_ROLES: RoleConfig[] = [
     hoist: true,
     mentionable: false,
   }),
-  role(ROLE_NAMES.member, '#2ECC71', 'hierarchy'),
+];
+
+export const MEMBER_ROLE: RoleConfig = role(ROLE_NAMES.member, '#2ECC71', 'hierarchy', [
+  PermissionFlagsBits.SendMessages,
+  PermissionFlagsBits.AddReactions,
+  PermissionFlagsBits.EmbedLinks,
+  PermissionFlagsBits.AttachFiles,
+  PermissionFlagsBits.ReadMessageHistory,
+  PermissionFlagsBits.CreatePublicThreads,
+  PermissionFlagsBits.SendMessagesInThreads,
+  PermissionFlagsBits.Connect,
+  PermissionFlagsBits.Speak,
+]);
+
+export const STATE_ROLES: RoleConfig[] = [
   role(ROLE_NAMES.muted, '#555555', 'hierarchy'),
   role(ROLE_NAMES.pending, BRANDING.colors.coldGrey, 'hierarchy'),
+];
+
+export const HIERARCHY_ROLES: RoleConfig[] = [
+  ...STAFF_ROLES,
+  ...PRIVATE_ACCESS_ROLES,
+  MEMBER_ROLE,
+  ...STATE_ROLES,
 ];
 
 export const UNIVERSE_ROLES: RoleConfig[] = [
@@ -172,8 +189,7 @@ export const COLOR_ROLES: RoleConfig[] = [
   role(ROLE_NAMES.colorSakura, '#FF8FB3', 'color'),
 ];
 
-export const BOT_ROLES: RoleConfig[] = [
-  role(ROLE_NAMES.bot, '#5865F2', 'bot', [], { hoist: true, mentionable: false }),
+export const SPECIALIZED_BOT_ROLES: RoleConfig[] = [
   role(
     ROLE_NAMES.botModeration,
     '#3498DB',
@@ -209,13 +225,25 @@ export const BOT_ROLES: RoleConfig[] = [
   role(ROLE_NAMES.botMusic, '#2ECC71', 'bot', [], { hoist: true, mentionable: false }),
 ];
 
+export const COMMON_BOT_ROLE: RoleConfig = role(ROLE_NAMES.bot, '#5865F2', 'bot', [], {
+  hoist: true,
+  mentionable: false,
+});
+
+export const BOT_ROLES: RoleConfig[] = [...SPECIALIZED_BOT_ROLES, COMMON_BOT_ROLE];
+
 export const SERVER_ROLES: RoleConfig[] = [
-  ...HIERARCHY_ROLES,
+  ...STAFF_ROLES,
+  // Les vrais rôles managed des bots externes servent d'ancres et ne sont pas créés ici.
+  ...SPECIALIZED_BOT_ROLES,
+  ...COLOR_ROLES,
+  ...PRIVATE_ACCESS_ROLES,
+  MEMBER_ROLE,
   ...UNIVERSE_ROLES,
   ...GAME_ROLES,
   ...NOTIFICATION_ROLES,
-  ...COLOR_ROLES,
-  ...BOT_ROLES,
+  ...STATE_ROLES,
+  COMMON_BOT_ROLE,
 ];
 
 export const GAMING_ROLE_TREE = {

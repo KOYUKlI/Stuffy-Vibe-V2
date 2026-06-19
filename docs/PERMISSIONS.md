@@ -32,7 +32,15 @@ Un membre validé ne voit pas automatiquement les univers spécialisés. Il doit
 - `🎨・Créatif` : accès à `✎・CRÉATIF`.
 - `💻・Tech` : accès à `⌘・TECH`.
 - `⭐・Ancien` : accès à `☾・ANCIENS`.
-- `💎・Cercle privé` : accès à `✦・CERCLE PRIVÉ` et aussi à `☾・ANCIENS`.
+- `💎・Cercle privé` : accès uniquement à `✦・CERCLE PRIVÉ`.
+
+## Rôles Couleur
+
+Discord affiche la couleur du rôle coloré le plus haut dans la hiérarchie de l’utilisateur.
+
+Les rôles couleur doivent donc rester au-dessus de `✅・Membre`, `⭐・Ancien`, `💎・Cercle privé`, des rôles univers, des rôles jeux et des rôles notifications. Ils restent sous `神 (Fondateur)`, `🛡️・Admin`, `🔧・Modérateur`, les vrais rôles des bots externes et les rôles bots spécialisés sensibles.
+
+Si une couleur ne s'affiche pas, lance d'abord `/sync dry-run:true`, vérifie la hiérarchie proposée et ne passe en mode réel qu'après validation humaine.
 
 ## Staff
 
@@ -50,7 +58,7 @@ Un membre validé ne voit pas automatiquement les univers spécialisés. Il doit
 
 Chaque bot externe reçoit `🤖・Bot` plus un rôle spécialisé :
 
-- `🛠️・Bot Modération` : Carl-bot pour autorole, greetings, validation et reaction roles.
+- `🛠️・Bot Modération` : Sapphire pour autorole, greetings, validation et panels de rôles.
 - `🛡️・Bot Automod` : Dyno pour automod, logs automod et modération légère.
 - `🎫・Bot Tickets` : Ticket Tool pour `🎫・support`, `🎫・tickets-logs` et `🚨・signalements`.
 - `🔊・Bot Vocal` : VoiceMaster/TempVoice pour `➕・créer-un-vocal` et les vocaux temporaires.

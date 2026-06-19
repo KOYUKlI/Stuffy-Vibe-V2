@@ -1,15 +1,22 @@
 import type { Role } from 'discord.js';
-import { PROTECTED_ROLE_NAMES } from '../config/roles.config.js';
+import { SERVER_ROLES } from '../config/roles.config.js';
 
-export const CONFIRMATION_WORD = 'CONFIRM';
+export type DeletionTarget = 'CHANNEL' | 'ROLE';
 
-export function isConfirmed(value: string): boolean {
-  return value === CONFIRMATION_WORD;
+export function deletionConfirmation(target: DeletionTarget, id: string): string {
+  return `DELETE_${target}:${id}`;
 }
 
-export function isProtectedRole(role: Role): boolean {
-  return (
-    role.guild.roles.everyone.id === role.id ||
-    (PROTECTED_ROLE_NAMES as readonly string[]).includes(role.name)
-  );
+export function isDeletionConfirmed(value: string, target: DeletionTarget, id: string): boolean {
+  return value === deletionConfirmation(target, id);
+}
+
+export function roleDeletionBlockReason(role: Role): string | undefined {
+  if (role.guild.roles.everyone.id === role.id) return '@everyone ne peut jamais être supprimé.';
+  if (role.managed || role.tags?.botId) return 'Ce rôle est géré par Discord ou une intégration.';
+  if (SERVER_ROLES.some((configuredRole) => configuredRole.name === role.name)) {
+    return 'Ce rôle appartient à la configuration du projet.';
+  }
+  if (!role.editable) return 'Le rôle est plus haut ou égal au rôle du bot.';
+  return undefined;
 }
