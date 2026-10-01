@@ -1,8 +1,10 @@
-# 답답한 분위기 V2 — Provisioning Bot
+# Stuffy-Vibe-V2
+Outil de configuration et d'audit d'un serveur Discord, écrit en TypeScript avec Node.js et discord.js v14.
 
-Bot Discord en **Node.js + TypeScript + discord.js v14** pour provisionner et maintenir la structure du serveur privé **답답한 분위기 V2**.
+Il gère la structure du serveur : rôles, salons, permissions, synchronisation et export. Les commandes setup et sync proposent une simulation avant application.
+Le contexte est celui d'un serveur privé. Ce dépôt est conservé comme outil d'apprentissage.
 
-Ce bot est volontairement limité : il crée, synchronise, audite, exporte et ajuste l’infrastructure du serveur. Il ne gère pas la vie quotidienne et peut être arrêté après `/setup` ou après une opération de maintenance.
+Prérequis du manifeste : Node.js 20 ou plus. Aucun test ni appel à Discord n'a été exécuté pendant ce nettoyage.
 
 ## Ce que le bot ne fait pas
 
